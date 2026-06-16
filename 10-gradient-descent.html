@@ -18,7 +18,7 @@
   <header>
     <div class="tag">PART 4 · Chapter 10</div>
     <h1>경사하강 — 기울기 반대로 한 걸음씩</h1>
-    <p class="intro">드디어 최적화의 심장이에요. 가장 빠른 내리막은 <b>−∇f</b>(기울기 반대)였죠(8·9장). 그 방향으로 <b>학습률 η만큼 한 걸음</b> 옮기길 반복하면 골짜기(최소)에 닿아요: <b>x ← x − η·f′(x)</b>. 딥러닝이 손실을 줄이는 방식이 정확히 이거예요. 학습률이 전부를 좌우하죠.</p>
+    <p class="intro">드디어 최적화의 심장이에요. 가장 빠른 내리막은 <b>−∇f</b>(기울기 반대)였죠(8·9장). 그 방향으로 <b>학습률 η만큼 한 걸음</b> 옮기길 반복하면 골짜기(최소)에 닿아요: <b>x ← x − η·f′(x)</b>. (<b>η</b>는 "보폭 배율" — 기울기 방향으로 <b>얼마나 멀리</b> 갈지 정하는 작은 양수예요.) 딥러닝이 손실을 줄이는 방식이 정확히 이거예요. 학습률이 전부를 좌우하죠.</p>
   </header>
 
   <nav class="stepper" id="stepper">
@@ -61,7 +61,7 @@
   <section class="panel" data-panel="2">
     <span class="kicker" style="color:var(--v)">Step 02 — On a 2D Landscape</span>
     <h2>지형 위에서 골을 향해</h2>
-    <p class="lead">2D 지형(등고선)에서도 똑같아요. 매 걸음 <b>−∇f</b>(가장 가파른 내리막) 방향으로 이동하면, 경로가 골을 향해 굽이쳐 내려가요. 시작점과 학습률을 바꿔 경로를 비교해 보세요.</p>
+    <p class="lead">2D 지형(등고선)에서도 똑같아요. 1D의 기울기 <b>f′</b>이 다차원에선 <b>∇f</b>(그래디언트, 8·9장의 그것)일 뿐이에요. 매 걸음 <b>−∇f</b>(가장 가파른 내리막) 방향으로 이동하면, 경로가 골을 향해 굽이쳐 내려가요. 시작점과 학습률을 바꿔 경로를 비교해 보세요.</p>
     <div class="ctrl"><label>학습률 η</label><input type="range" id="lr2" min="5" max="120" value="35"><span class="val" id="lr2v">0.35</span></div>
     <div class="row" style="gap:8px;margin:6px 0">
       <button class="btn" id="roll2">▶ 굴리기</button>

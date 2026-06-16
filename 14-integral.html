@@ -32,18 +32,18 @@
   <section class="panel show" data-panel="0">
     <span class="kicker" style="color:var(--hot)">Step 00 — Rectangles</span>
     <h2>가는 막대로 채울수록 정확해진다</h2>
-    <p class="lead">곡선 아래를 <b>n개의 직사각형</b>으로 채워 그 넓이를 다 더해요. 막대가 적으면 곡선과 어긋나 오차가 크지만, <b>n을 늘릴수록</b> 빈틈이 줄어 <b>참값에 수렴</b>해요. 슬라이더로 막대 수를 바꿔보세요.</p>
+    <p class="lead">곡선 아래를 <b>n개의 직사각형</b>으로 채워 그 넓이를 다 더해요. 여기선 각 막대의 높이를 <b>왼쪽 끝</b>에서 재서(계산을 단순하게) 막대가 곡선보다 살짝 <b>모자라요</b>. 막대가 적으면 그 빈틈이 크지만, <b>n을 늘릴수록</b> 빈틈이 줄어 <b>참값에 수렴</b>하죠. 슬라이더로 막대 수를 바꿔보세요.</p>
     <div class="ctrl"><label>막대 수 n</label><input type="range" id="n0" min="2" max="80" value="6"><span class="val" id="n0v">6</span></div>
     <div id="info0" class="callout q"></div>
     <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
-    <p class="note" style="margin-top:12px">→ 막대 하나의 넓이 = 높이 f(x) × 폭 Δx. 그걸 다 더한 게 <b>리만합</b>이고, 막대를 무한히 가늘게(Δx→0) 한 극한이 <b>적분</b> ∫f dx예요. 미분에서 h→0으로 기울기를 얻었듯, 적분은 Δx→0으로 넓이를 얻죠.</p>
+    <p class="note" style="margin-top:12px">→ 막대 하나의 넓이 = 높이 f(x) × 폭 Δx. 그걸 다 더한 게 <b>리만합</b>이고, 막대를 무한히 가늘게(Δx→0) 한 극한이 <b>적분</b>이에요. 이때 무한히 가는 폭을 <b>dx</b>로, "다 더한다"는 뜻의 길쭉한 S자를 <b>∫</b>로 써서 <b>∫f dx</b>라 적어요. 미분에서 h→0으로 기울기를 얻었듯, 적분은 Δx→0으로 넓이를 얻죠.</p>
   </section>
 
   <!-- STEP 1 -->
   <section class="panel" data-panel="1">
     <span class="kicker" style="color:var(--q)">Step 01 — Signed Area</span>
     <h2>축 아래 넓이는 음수로 센다</h2>
-    <p class="lead">적분은 <b>부호 있는 넓이</b>예요. 곡선이 <b>축 위</b>에 있으면 +, <b>축 아래</b>면 −로 세죠(빨강). 그래서 위·아래가 같으면 <b>서로 상쇄</b>돼 적분이 0이 될 수도 있어요. 구간 끝 b를 옮겨 누적이 어떻게 변하는지 보세요.</p>
+    <p class="lead">여기 곡선은 위아래로 출렁이는 <b>파동(sin)</b>이에요. 적분은 <b>부호 있는 넓이</b>라, 곡선이 <b>축 위</b>면 +, <b>축 아래</b>면 −로 세죠(빨강). 그래서 위·아래가 같으면 <b>서로 상쇄</b>돼 적분이 0이 될 수도 있어요. 구간 끝 b를 옮겨 누적이 어떻게 변하는지 보세요.</p>
     <div class="ctrl"><label>구간 끝 b</label><input type="range" id="b1" min="50" max="628" value="628"><span class="val" id="b1v">6.28</span></div>
     <div id="info1" class="callout q"></div>
     <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>

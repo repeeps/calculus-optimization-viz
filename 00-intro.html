@@ -42,14 +42,14 @@
     <h2>미적분·최적화는 어디에 쓰이나</h2>
     <p class="lead">"가장 좋은 값을 찾는다"는 문제는 도처에 있어요. 카드를 눌러 보세요.</p>
     <div class="cards" id="useCards"></div>
-    <p class="note" style="margin-top:14px">→ 공통점: <b>어떤 값을 바꾸면 결과가 어떻게 변하나</b>(미분)를 보고, <b>가장 좋은 쪽으로 조금씩 이동</b>(최적화)해요. 이 코스의 척추는 <b>도함수 → 연쇄법칙 → 그래디언트 → 경사하강</b> 네 챕터예요.</p>
+    <p class="note" style="margin-top:14px">→ 공통점: <b>어떤 값을 바꾸면 결과가 어떻게 변하나</b>(미분)를 보고, <b>가장 좋은 쪽으로 조금씩 이동</b>(최적화)해요. 이 코스의 척추는 <b>도함수 → 연쇄법칙 → 그래디언트(여러 입력일 때의 기울기) → 경사하강</b> 네 챕터예요.</p>
   </section>
 
   <!-- STEP 1 -->
   <section class="panel" data-panel="1">
     <span class="kicker" style="color:var(--q)">Step 01 — Slope</span>
     <h2>미분 = 그 점의 기울기</h2>
-    <p class="lead">곡선 위 한 점에서 살짝 움직이면 얼마나 오르내리나 — 그 <b>기울기</b>가 바로 미분이에요. 점을 옮겨 보세요. <b>기울기가 +면 오르막, −면 내리막, 0이면 봉우리·골짜기</b>예요.</p>
+    <p class="lead">곡선은 "<b>값을 넣으면 결과(높이)가 나오는 규칙</b>"이에요. 곡선 위 한 점에서 살짝 움직이면 얼마나 오르내리나 — 그 <b>기울기</b>가 바로 미분이에요. 점을 옮겨 보세요. <b>기울기가 +면 오르막, −면 내리막, 0이면 봉우리·골짜기</b>예요.</p>
     <div class="ctrl"><label>점 위치 x</label><input type="range" id="x1" min="-330" max="330" value="-200"><span class="val" id="x1v">−2.0</span></div>
     <div id="info1" class="callout q"></div>
     <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>

@@ -22,7 +22,7 @@
   <header>
     <div class="tag">PART 2 · Chapter 04</div>
     <h1>연쇄법칙 — 함수 속의 함수, 기울기는 곱해진다</h1>
-    <p class="intro">함수를 <b>연달아</b> 통과시킬 때(합성), 전체의 기울기는 <b>각 단계 기울기의 곱</b>이에요. "x를 살짝 흔들면 중간값 u가 g′배 흔들리고, 그게 다시 f′배 흔들려 y가 된다" — 그래서 <b>dy/dx = f′ × g′</b>. 이 한 줄이 신경망 <b>역전파</b>의 전부예요.</p>
+    <p class="intro">함수를 <b>연달아</b> 통과시킬 때(합성), 전체의 기울기는 <b>각 단계 기울기의 곱</b>이에요. "x를 살짝 흔들면 중간값 u가 g′배 흔들리고, 그게 다시 f′배 흔들려 y가 된다" — 그래서 <b>dy/dx = f′ × g′</b>예요. (<b>dy/dx</b>는 f′의 다른 표기일 뿐 — "y가 x에 따라 변하는 비율"로 같은 뜻이에요.) 이 한 줄이 신경망 <b>역전파</b>의 전부예요.</p>
   </header>
 
   <nav class="stepper" id="stepper">
@@ -135,7 +135,7 @@ const PRE = {
     document.getElementById('chart1').innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;display:block">${g}</svg>`;
     document.getElementById('info1').innerHTML =
       `<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,1)} · g′=${VZ.fmt(gp,2)} · f′(u)=${VZ.fmt(fp,2)} → 곱 = <b>${VZ.fmt(prod,2)}</b></div>
-       <p style="margin:0">x를 1 흔들면 u가 <b>${VZ.fmt(gp,2)}배</b>(=g′), 그 흔들림이 다시 <b>${VZ.fmt(fp,2)}배</b>(=f′)로 → y는 합쳐서 <b>${VZ.fmt(prod,2)}배</b> 흔들려요. <span style="color:var(--faint)">(막대는 크기, 배율이 음수면 흔들림이 <b>반대 방향</b>이라는 뜻)</span></p>`;
+       <p style="margin:0">x의 흔들림을 1로 치면(비율은 흔드는 크기와 무관) u가 <b>${VZ.fmt(gp,2)}배</b>(=g′), 그 흔들림이 다시 <b>${VZ.fmt(fp,2)}배</b>(=f′)로 → y는 합쳐서 <b>${VZ.fmt(prod,2)}배</b> 흔들려요. <span style="color:var(--faint)">(막대는 크기, 배율이 음수면 흔들림이 <b>반대 방향</b>이라는 뜻)</span></p>`;
   }
   document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
   render();
