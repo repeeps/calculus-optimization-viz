@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 도함수 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .panellab{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace;margin:8px 0 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 1 · Chapter 03</div>
+    <h1>도함수 — 기울기를 모으면 새로운 함수</h1>
+    <p class="intro">2장에서 "한 점의 순간 기울기"를 구했어요. 이걸 <b>모든 점에서</b> 구해 늘어놓으면, 입력마다 "그 점의 기울기"를 돌려주는 <b>또 하나의 함수</b>가 생겨요 — 이게 <b>도함수 f′</b>예요. f가 오르면 f′>0, 내리면 f′<0, 봉우리·골에선 f′=0이죠.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 두 그래프</button>
+    <button data-s="1">01 · 부호가 말해준다</button>
+    <button data-s="2">02 · f′=0 → 극값</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Slope Becomes a Curve</span>
+    <h2>위의 기울기 = 아래의 높이</h2>
+    <p class="lead">위 그래프는 함수 <b>f</b>, 아래 그래프는 도함수 <b>f′</b>예요. 점을 옮기면 위에 <b>접선</b>이 그려지고, 그 <b>기울기값</b>이 아래 그래프에 점으로 찍혀요. 위 접선이 가파를수록 아래 점이 높아요.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x0" min="-300" max="300" value="-180"><span class="val" id="x0v">−1.8</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="panellab">위 — 함수 f(x)</div><div id="top0"></div>
+    <div class="panellab">아래 — 도함수 f′(x) (각 점의 기울기)</div><div id="bot0"></div>
+    <p class="note" style="margin-top:12px">→ 위 접선 기울기를 점 하나하나 옮겨가며 아래에 찍으면, 점들이 모여 <b>f′ 곡선</b>이 돼요. 도함수는 "기울기를 그린 그래프"예요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — The Sign Tells the Story</span>
+    <h2>f가 오르내리면 f′의 부호가 바뀐다</h2>
+    <p class="lead">함수를 바꿔 보세요. f가 <b>올라가는 구간</b>에선 f′이 0 위(양수), <b>내려가는 구간</b>에선 0 아래(음수)예요. 두 그래프를 위아래로 비교하면 부호가 정확히 대응해요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="f_sq">x²</button>
+      <button class="btn" id="f_cu" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">x³꼴</button>
+      <button class="btn" id="f_wv" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">물결</button>
+    </div>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x1" min="-300" max="300" value="-120"><span class="val" id="x1v">−1.2</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="panellab">위 — f(x)</div><div id="top1"></div>
+    <div class="panellab">아래 — f′(x)</div><div id="bot1"></div>
+    <p class="note" style="margin-top:12px">→ 물결(sin꼴)을 보면 f′이 또 다른 물결(cos꼴)이에요. f가 가장 가파르게 오를 때 f′이 최대, 봉우리에서 f′=0. <b>도함수의 부호 = f의 증가/감소</b>.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — f′=0 marks Peaks &amp; Valleys</span>
+    <h2>f′이 0을 지나는 곳이 봉우리·골</h2>
+    <p class="lead">f의 <b>봉우리(극대)·골(극소)</b>에서는 접선이 평평 → f′=0이에요. 점을 움직여 아래 f′ 곡선이 <b>0을 통과하는 곳</b>을 찾으면, 위에서 정확히 극값에 닿아요. <b>최적화가 "f′=0인 곳"을 찾는 이유</b>죠.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x2" min="-260" max="260" value="60"><span class="val" id="x2v">0.6</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="panellab">위 — f(x) (봉우리 2개·골 1개)</div><div id="top2"></div>
+    <div class="panellab">아래 — f′(x)</div><div id="bot2"></div>
+    <p class="note" style="margin-top:12px">→ f′=0은 "기울기가 0 = 평평"이라는 신호예요. 다만 f′=0이라고 다 최소는 아니에요(봉우리·안장도 f′=0). 그래서 12·13장에서 "정말 최소인지"를 곡률(2차 도함수)로 가려요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>도함수가 알려주는 것</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">f′ = 기울기 함수</div><p style="margin:0">각 점의 순간 기울기를 모은 새 함수. 위 접선 기울기 = 아래 f′의 높이.</p></div>
+      <div class="callout v"><div class="ttl">부호·영점이 핵심</div><p style="margin:0">f′>0 오름 / f′<0 내림 / f′=0 평평(극값 후보). 최적화는 f′=0을 겨냥해요.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">도함수는 "어디로 가야 올라가나/내려가나"를 점마다 알려줘요. 그래서 경사하강이 <b>−f′ 방향</b>으로 내려갈 수 있죠(10장). 다음 <b>4장 연쇄법칙</b>에선 "함수 속의 함수"를 미분하는 법 — 신경망 역전파의 핵심을 봅니다.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="04-chain-rule.html" style="color:var(--q);font-weight:700">CH 04 · 연쇄법칙</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 곡선·도함수는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 03 · 도함수');
+VZ.setupStepper();
+const CA = VZ.CA;
+
+// 두 패널(f / f′) 렌더 헬퍼
+function twoPanel(topId, botId, f, x, ranges){
+  const bt = CA.board2({W:560,H:200,xmin:ranges.xmin,xmax:ranges.xmax,ymin:ranges.tymin,ymax:ranges.tymax});
+  const bb = CA.board2({W:560,H:170,xmin:ranges.xmin,xmax:ranges.xmax,ymin:ranges.dymin,ymax:ranges.dymax});
+  const fp = x2 => CA.deriv(f, x2);
+  // top: f + tangent
+  let st = CA.axes(bt,{step:1}) + CA.fnPlot(bt, f, {color:'var(--q)'}) + CA.tangentLine(bt, f, x, {color:'var(--hot)'});
+  document.getElementById(topId).innerHTML = `<svg width="${bt.W}" height="${bt.H}" viewBox="0 0 ${bt.W} ${bt.H}" style="max-width:100%;display:block">${st}</svg>`;
+  // bottom: f' curve + point (x, f'(x))
+  const slope = fp(x);
+  let sb = CA.axes(bb,{step:1}) + CA.fnPlot(bb, fp, {color:'var(--v)'});
+  sb += `<line x1="${bb.X(x).toFixed(1)}" y1="${bb.padT}" x2="${bb.X(x).toFixed(1)}" y2="${(bb.H-bb.padB).toFixed(1)}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  sb += `<circle cx="${bb.X(x).toFixed(1)}" cy="${bb.Y(slope).toFixed(1)}" r="5.5" fill="var(--hot)"/>`;
+  document.getElementById(botId).innerHTML = `<svg width="${bb.W}" height="${bb.H}" viewBox="0 0 ${bb.W} ${bb.H}" style="max-width:100%;display:block">${sb}</svg>`;
+  return slope;
+}
+
+// ---------- STEP 0 ----------
+(function(){
+  const f = x => x*x; let x = -1.8;
+  const R = {xmin:-3.2,xmax:3.2,tymin:-0.5,tymax:11,dymin:-7,dymax:7};
+  function render(){
+    const m = twoPanel('top0','bot0', f, x, R);
+    document.getElementById('info0').innerHTML =
+      `<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,1)} · 위 접선 기울기 = 아래 점 높이 = <b>${VZ.fmt(m,2)}</b></div>
+       <p style="margin:0">${m>0.1?'위 곡선이 오르막 → f′>0(아래 점이 0 위).':m<-0.1?'위 곡선이 내리막 → f′<0(아래 점이 0 아래).':'위가 거의 평평 → f′≈0.'}</p>`;
+  }
+  document.getElementById('x0').oninput=e=>{ x=+e.target.value/100; document.getElementById('x0v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 부호 대응 ----------
+(function(){
+  const FNS = {
+    sq: { f:x=>x*x, R:{xmin:-3.2,xmax:3.2,tymin:-0.5,tymax:11,dymin:-7,dymax:7} },
+    cu: { f:x=>0.35*x*x*x, R:{xmin:-3,xmax:3,tymin:-11,tymax:11,dymin:-1,dymax:11} },
+    wv: { f:x=>2*Math.sin(x), R:{xmin:-3.4,xmax:3.4,tymin:-2.5,tymax:2.5,dymin:-2.5,dymax:2.5} },
+  };
+  let kind='sq', x=-1.2;
+  function render(){
+    const F=FNS[kind]; const m=twoPanel('top1','bot1', F.f, x, F.R);
+    document.getElementById('info1').innerHTML =
+      `<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,1)} · f′=${VZ.fmt(m,2)}</div>
+       <p style="margin:0">${m>0.1?'이 구간에서 f는 <b>오르막</b> → 아래 f′은 0 <b>위</b>.':m<-0.1?'이 구간에서 f는 <b>내리막</b> → 아래 f′은 0 <b>아래</b>.':'여기서 f는 <b>평평</b> → f′≈0.'}</p>`;
+  }
+  function setK(k){ kind=k; [['f_sq','sq'],['f_cu','cu'],['f_wv','wv']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('f_sq').onclick=()=>setK('sq');
+  document.getElementById('f_cu').onclick=()=>setK('cu');
+  document.getElementById('f_wv').onclick=()=>setK('wv');
+  document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  setK('sq');
+})();
+
+// ---------- STEP 2 : f′=0 극값 ----------
+(function(){
+  // 봉우리 2 + 골 1 : f = 0.1x⁴ − 0.8x² (극값 x=0(극대 0), x=±2(극소 −1.6))
+  const f = x => 0.1*x*x*x*x - 0.8*x*x; let x = 0.6;
+  const R = {xmin:-3.2,xmax:3.2,tymin:-2,tymax:2.5,dymin:-3,dymax:3};
+  function render(){
+    const m = twoPanel('top2','bot2', f, x, R);
+    const near = Math.abs(m)<0.15;
+    document.getElementById('info2').innerHTML =
+      `<div class="ttl" style="color:var(--v)">x=${VZ.fmt(x,2)} · f′=${VZ.fmt(m,2)}</div>
+       <p style="margin:0">${near?'<b style="color:var(--good)">f′≈0!</b> 여기가 봉우리/골(극값)이에요 — 위 접선이 평평하죠.':'아직 기울어 있어요. 아래 f′ 곡선이 <b>0을 통과하는 x</b>(약 0, ±2)로 옮겨보세요.'}</p>`;
+  }
+  document.getElementById('x2').oninput=e=>{ x=+e.target.value/100; document.getElementById('x2v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 극한·순간변화율 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 1 · Chapter 02</div>
+    <h1>극한·순간변화율 — 두 점을 한없이 붙이면 접선</h1>
+    <p class="intro">1장에서 본 평균변화율은 <b>두 점 사이</b>의 기울기였어요. 그런데 "<b>바로 그 점</b>에서의 기울기"는? 두 번째 점을 <b>한없이 가깝게</b> 끌어오면(극한) 할선이 <b>접선</b>으로 수렴해요. 그 접선의 기울기가 바로 <b>순간변화율 = 미분</b>이에요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 극한 = 다가가는 값</button>
+    <button data-s="1">01 · 할선 → 접선</button>
+    <button data-s="2">02 · h→0, 미분값</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Limit</span>
+    <h2>그 점의 값이 아니라, 다가가는 값</h2>
+    <p class="lead">극한은 "x가 어떤 값에 <b>한없이 다가갈 때</b> 함수가 다가가는 값"이에요. 그 점에서 함수가 <b>구멍(정의 안 됨)</b>이어도, 양쪽에서 다가가는 값이 같으면 극한이 존재해요.</p>
+    <div class="ctrl"><label>다가가는 거리</label><input type="range" id="d0" min="1" max="150" value="120"><span class="val" id="d0v">1.20</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 이 함수는 원래 <b>(x²−1)/(x−1)</b>인데, 정리하면 x+1이지만 <b>x=1만 쏙 빠져요</b>(거기선 0/0이라 정의 안 됨, 열린 원). 그래도 왼쪽·오른쪽 양쪽에서 다가가는 값이 똑같이 <b>2</b>예요. 그래서 "x→1일 때 극한 = 2". <b>그 점의 값과 무관하게, 주변에서 다가가는 값</b>이 극한이에요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Secant → Tangent</span>
+    <h2>두 번째 점을 끌어오면 할선이 접선으로</h2>
+    <p class="lead">고정점 <b>P</b>(파랑)와 두 번째 점 <b>Q</b>를 잇는 게 <b>할선</b>(점선). Q를 P쪽으로 <b>간격 h</b>만큼 끌어오면, 할선이 점점 <b>접선</b>(주황)으로 다가가요. 할선 기울기 = (f(x₀+h) − f(x₀)) / h.</p>
+    <div class="ctrl"><label>점 P 위치 x₀</label><input type="range" id="xp" min="-150" max="150" value="100"><span class="val" id="xpv">1.0</span></div>
+    <div class="ctrl"><label>간격 h</label><input type="range" id="h1" min="3" max="150" value="150"><span class="val" id="h1v">1.50</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ h를 줄일수록 할선(점선)이 접선(주황)에 포개져요. "h=0이면 0/0 아닌가?" — 맞아요, 그래서 <b>0으로 두지 않고 한없이 가까이</b> 보내는 거예요. 분자도 분모도 0에 가지만 그 <b>비율</b>은 특정 값에 수렴해요(다음 스텝).</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — h→0</span>
+    <h2>비율이 수렴하는 그 값 = 미분</h2>
+    <p class="lead">h를 0.5 → 0.1 → 0.01… 점점 줄이며 할선 기울기를 보면 한 값에 <b>수렴</b>해요. 그 극한값이 <b>그 점의 순간 기울기 = 미분 f′(x₀)</b>예요. ▶ 버튼으로 h를 자동으로 줄여보세요.</p>
+    <div class="ctrl"><label>점 P 위치 x₀</label><input type="range" id="xp2" min="-150" max="150" value="100"><span class="val" id="xp2v">1.0</span></div>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="shrink">▶ h→0</button>
+      <button class="btn" id="reset2" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ x²에서는 어떤 x₀를 골라도 수렴값이 정확히 <b>2·x₀</b>예요(x₀=1이면 2, x₀=−1.5면 −3). 이렇게 "각 점의 순간 기울기"를 주는 규칙이 <b>도함수</b> — 다음 3장 주제예요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>미분은 "한없이 가까운 두 점의 기울기"</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">극한</div><p style="margin:0">그 점의 값이 아니라 <b>양쪽에서 다가가는 값</b>. 구멍이 있어도 극한은 있을 수 있어요.</p></div>
+      <div class="callout v"><div class="ttl">순간변화율 = 미분</div><p style="margin:0">할선 기울기 (f(x₀+h)−f(x₀))/h 에서 <b>h→0</b>의 극한. = 그 점의 접선 기울기.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">평균변화율(구간)과 순간변화율(점)의 차이가 미분의 전부예요. 이 "그 점의 기울기"를 <b>모든 점에서</b> 구하면 새로운 함수, <b>도함수 f′</b>가 나와요. 그리고 그 기울기야말로 최적화에서 "어디로 내려갈지"를 알려주는 길잡이죠.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="03-derivative-function.html" style="color:var(--q);font-weight:700">CH 03 · 도함수</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 할선·접선·극한은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 02 · 극한·순간변화율');
+VZ.setupStepper();
+const CA = VZ.CA;
+
+// ---------- STEP 0 : 극한(구멍 메우기) ----------
+(function(){
+  const g = x => x + 1;   // (x²−1)/(x−1) = x+1 (x≠1), x=1에서 구멍
+  let d = 1.2;
+  const b = CA.board2({W:560,H:280,xmin:-1.5,xmax:3.5,ymin:-0.5,ymax:4.5});
+  function render(){
+    const xl = 1 - d, xr = 1 + d, yl = g(xl), yr = g(xr);
+    let s = CA.axes(b,{step:1});
+    s += CA.fnPlot(b, g, {color:'var(--q)'});
+    // 양쪽 접근점 + 화살표(다가감)
+    s += `<circle cx="${b.X(xl).toFixed(1)}" cy="${b.Y(yl).toFixed(1)}" r="5" fill="var(--good)"/>`;
+    s += `<circle cx="${b.X(xr).toFixed(1)}" cy="${b.Y(yr).toFixed(1)}" r="5" fill="var(--hot)"/>`;
+    // x=1 구멍 (열린 원)
+    s += `<circle cx="${b.X(1).toFixed(1)}" cy="${b.Y(2).toFixed(1)}" r="5.5" fill="var(--panel-2)" stroke="var(--v)" stroke-width="2"/>`;
+    s += `<line x1="${b.X(1).toFixed(1)}" y1="${b.padT}" x2="${b.X(1).toFixed(1)}" y2="${(b.H-b.padB).toFixed(1)}" stroke="var(--v)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    s += `<text x="${b.X(1).toFixed(1)}" y="${(b.H-b.padB+14).toFixed(1)}" text-anchor="middle" fill="var(--v)" font-size="11" font-family="JetBrains Mono">x→1</text>`;
+    document.getElementById('chart0').innerHTML = `<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info0').innerHTML =
+      `<div class="ttl" style="color:var(--q)">왼쪽 f(${VZ.fmt(xl,2)})=${VZ.fmt(yl,2)} · 오른쪽 f(${VZ.fmt(xr,2)})=${VZ.fmt(yr,2)}</div>
+       <p style="margin:0">거리를 줄일수록 양쪽 값이 <b>둘 다 2</b>로 모여요. x=1 자체는 구멍(정의 안 됨)이지만, 극한은 <b>2</b>예요.</p>`;
+  }
+  document.getElementById('d0').oninput=e=>{ d=+e.target.value/100; document.getElementById('d0v').textContent=d.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 할선 → 접선 ----------
+(function(){
+  const f = x => x*x; let x0 = 1.0, h = 1.5;
+  function render(){
+    const b = CA.board2({W:560,H:280,xmin:-3,xmax:3.4,ymin:-0.5,ymax:9.8});
+    let s = CA.axes(b,{step:1});
+    s += CA.fnPlot(b, f, {color:'var(--q)'});
+    s += CA.tangentLine(b, f, x0, {color:'var(--hot)'});            // 접선(목표)
+    const sec = CA.secantLine(b, f, x0, x0+h, {color:'var(--v)'});  // 할선
+    s += sec.svg;
+    document.getElementById('chart1').innerHTML = `<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const exact = CA.deriv(f, x0);
+    document.getElementById('info1').innerHTML =
+      `<div class="ttl" style="color:var(--q)">할선 기울기 = ${VZ.fmt(sec.slope,3)} · 접선 기울기 = ${VZ.fmt(exact,2)}</div>
+       <p style="margin:0">P=(${VZ.fmt(x0,1)}, ${VZ.fmt(f(x0),2)}), Q는 h=${VZ.fmt(h,2)}만큼 떨어진 점. h가 작아질수록 할선(보라 점선)이 접선(주황)에 <b>딱 붙어요</b>(차이 ${VZ.fmt(Math.abs(sec.slope-exact),3)}).</p>`;
+  }
+  document.getElementById('xp').oninput=e=>{ x0=+e.target.value/100; document.getElementById('xpv').textContent=(x0<0?'−':'')+Math.abs(x0).toFixed(1); render(); };
+  document.getElementById('h1').oninput=e=>{ h=+e.target.value/100; document.getElementById('h1v').textContent=h.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : h→0 수렴 ----------
+(function(){
+  const f = x => x*x; let x0 = 1.0, h = 1.5, cancel = null;
+  function draw(){
+    const b = CA.board2({W:560,H:280,xmin:-3,xmax:3.4,ymin:-0.5,ymax:9.8});
+    let s = CA.axes(b,{step:1});
+    s += CA.fnPlot(b, f, {color:'var(--q)'});
+    s += CA.tangentLine(b, f, x0, {color:'var(--hot)'});
+    const sec = CA.secantLine(b, f, x0, x0+h, {color:'var(--v)'});
+    s += sec.svg;
+    document.getElementById('chart2').innerHTML = `<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const exact = CA.deriv(f, x0);
+    document.getElementById('info2').innerHTML =
+      `<div class="ttl" style="color:var(--v)">h = ${VZ.fmt(h,3)} · 할선 기울기 = <b>${VZ.fmt(sec.slope,3)}</b> · 목표(미분) = ${VZ.fmt(exact,2)}</div>
+       <p style="margin:0">${h<=0.02?'<b style="color:var(--good)">거의 수렴!</b> 할선 기울기가 미분값 '+VZ.fmt(exact,2)+'(=2·x₀)에 딱 붙었어요.':'h를 더 줄이면 '+VZ.fmt(exact,2)+'에 다가가요.'}</p>`;
+  }
+  function reset(){ if(cancel){cancel();cancel=null;} h=1.5; draw(); }
+  function shrink(){ if(cancel)cancel();
+    const seq=[1.5,1.0,0.6,0.3,0.15,0.07,0.03,0.01]; let i=0;
+    cancel = CA.animatePath(seq.map(v=>[v]), (sub,idx)=>{ h=seq[idx]; draw(); }, {interval:420});
+  }
+  document.getElementById('xp2').oninput=e=>{ x0=+e.target.value/100; document.getElementById('xp2v').textContent=(x0<0?'−':'')+Math.abs(x0).toFixed(1); reset(); };
+  document.getElementById('shrink').onclick=shrink;
+  document.getElementById('reset2').onclick=reset;
+  draw();
+})();
+</script>
+</body>
+</html>
