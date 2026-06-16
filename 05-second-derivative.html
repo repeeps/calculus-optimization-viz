@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 2차도함수·볼록/오목 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 2 · Chapter 05</div>
+    <h1>2차도함수 — 그릇이 위로 열렸나, 아래로 열렸나</h1>
+    <p class="intro">도함수 f′이 "기울기"라면, 그걸 또 미분한 <b>2차도함수 f″</b>는 "<b>기울기가 어떻게 변하나</b>"예요. f″>0이면 곡선이 <b>그릇 모양(볼록)</b>, f″<0이면 <b>봉우리 모양(오목)</b>이죠. 이 "휘어짐(곡률)"이 최적화에서 "여기가 진짜 골짜기인지"를 가려줘요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 그릇 vs 봉우리</button>
+    <button data-s="1">01 · 곡률 = f″</button>
+    <button data-s="2">02 · 변곡점</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Bowl vs Dome</span>
+    <h2>그릇은 볼록, 봉우리는 오목</h2>
+    <p class="lead">두 곡선을 비교해 보세요. <b>그릇(볼록)</b>은 기울기가 왼→오로 점점 <b>커져요</b>(−에서 +로) → f″>0. <b>봉우리(오목)</b>는 기울기가 점점 <b>작아져요</b>(+에서 −로) → f″<0. f″의 부호가 곧 "휘는 방향"이에요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="b_bowl">그릇 (x²)</button>
+      <button class="btn" id="b_dome" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">봉우리 (−x²)</button>
+    </div>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x0" min="-250" max="250" value="-150"><span class="val" id="x0v">−1.5</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 그릇에선 접선이 왼쪽에선 내려가다(기울기 −) 오른쪽에선 올라가요(기울기 +). 즉 <b>기울기 자체가 증가</b> → f″>0. 봉우리는 반대 → f″<0.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Curvature</span>
+    <h2>곡선 위 어디가 볼록이고 어디가 오목인가</h2>
+    <p class="lead">한 곡선 안에서도 <b>볼록(그릇)</b> 구간과 <b>오목(봉우리)</b> 구간이 섞여 있어요. 배경색이 <span style="color:var(--good)">초록=볼록(f″>0)</span>, <span style="color:var(--k)">코랄=오목(f″<0)</span>이에요. 점을 옮겨 f″ 부호를 확인하세요.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x1" min="-230" max="230" value="-150"><span class="val" id="x1v">−1.5</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 이 곡선은 왼쪽이 오목(봉우리 쪽), 오른쪽이 볼록(그릇 쪽)이에요. 색이 바뀌는 경계가 <b>변곡점</b> — 다음 스텝의 주제예요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Inflection</span>
+    <h2>변곡점 — 휘는 방향이 뒤집히는 곳</h2>
+    <p class="lead"><b>변곡점</b>은 볼록↔오목이 바뀌는 자리, 즉 <b>f″=0</b>인 곳이에요. 점을 옮겨 배경색이 코랄↔초록으로 바뀌는 경계를 찾으면, 그 자리에서 f″이 0을 지나요.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x2" min="-230" max="230" value="-80"><span class="val" id="x2v">−0.8</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 주의: 1차도함수 f′=0(평평)과 2차도함수 f″=0(변곡)은 <b>다른 것</b>이에요. f′=0은 봉우리·골(극값 후보), f″=0은 휘는 방향이 바뀌는 곳. 둘을 합쳐 보면 "여기가 진짜 골짜기(최소)인가"를 알 수 있죠(다음).</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>왜 최적화에서 곡률이 중요한가</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">f″ = 기울기의 기울기</div><p style="margin:0">f″>0 볼록(그릇) / f″<0 오목(봉우리) / f″=0 변곡점.</p></div>
+      <div class="callout v"><div class="ttl">극소 판정</div><p style="margin:0">f′=0이면서 <b>f″>0</b>이면 그 점은 <b>골짜기(극소)</b>. f′=0이고 f″<0이면 봉우리(극대).</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0"><b>볼록한 지형은 최적화의 천국</b>이에요 — 그릇처럼 골짜기가 하나뿐이라, f′=0을 찾으면 그게 곧 최소거든요(12장 볼록성). 또 곡률(f″)을 알면 "한 걸음을 얼마나 크게 디딜지"도 똑똑하게 정할 수 있어요(13장 뉴턴법). 다음 <b>6장</b>부터는 입력이 둘 이상인 <b>다변수</b>로 넓혀요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="06-multivariable.html" style="color:var(--q);font-weight:700">CH 06 · 다변수·등고선</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 곡선·곡률은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 05 · 2차도함수');
+VZ.setupStepper();
+const CA = VZ.CA;
+const d2 = (f,x,h=1e-3) => (f(x+h) - 2*f(x) + f(x-h)) / (h*h);   // 2차 도함수(중심차분)
+
+// f″ 부호로 배경 밴드 색칠 (초록=볼록, 코랄=오목)
+function curvatureBands(b, f, n=80){
+  let g=''; const w=b.plotW/n;
+  for(let i=0;i<n;i++){ const x=b.xmin+(b.xmax-b.xmin)*(i+0.5)/n; const c=d2(f,x);
+    if(Math.abs(c)<1e-6) continue;
+    const col = c>0 ? 'rgba(52,211,153,.13)' : 'rgba(251,113,133,.13)';
+    g += `<rect x="${(b.padL+i*w).toFixed(1)}" y="${b.padT}" width="${(w+0.6).toFixed(1)}" height="${b.plotH.toFixed(1)}" fill="${col}"/>`;
+  }
+  return g;
+}
+
+// ---------- STEP 0 : 그릇 vs 봉우리 ----------
+(function(){
+  const FNS={ bowl:{f:x=>x*x, ymin:-1,ymax:7.5}, dome:{f:x=>-x*x, ymin:-7.5,ymax:1} };
+  let kind='bowl', x=-1.5;
+  function render(){
+    const F=FNS[kind]; const b=CA.board2({W:560,H:280,xmin:-2.7,xmax:2.7,ymin:F.ymin,ymax:F.ymax});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,F.f,{color:'var(--q)'})+CA.tangentLine(b,F.f,x,{color:'var(--hot)'});
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const c=d2(F.f,x), slope=CA.deriv(F.f,x);
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,1)} · 기울기 f′=${VZ.fmt(slope,2)} · f″=${VZ.fmt(c,2)}</div>
+       <p style="margin:0">${c>0?'<b style="color:var(--good)">f″>0 → 볼록(그릇).</b> 점을 왼→오로 옮기면 접선 기울기가 점점 커져요.':'<b style="color:var(--k)">f″<0 → 오목(봉우리).</b> 점을 왼→오로 옮기면 접선 기울기가 점점 작아져요.'}</p>`;
+  }
+  function setK(k){ kind=k; [['b_bowl','bowl'],['b_dome','dome']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('b_bowl').onclick=()=>setK('bowl');
+  document.getElementById('b_dome').onclick=()=>setK('dome');
+  document.getElementById('x0').oninput=e=>{ x=+e.target.value/100; document.getElementById('x0v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  setK('bowl');
+})();
+
+// ---------- STEP 1 & 2 : 곡률 밴드 / 변곡점 (공유 곡선) ----------
+const SHAPE = x => (1/3)*x*x*x - x;   // f″=2x → 오목(x<0)·볼록(x>0), 변곡 x=0
+function bandChart(chartId, infoId, x, isStep2){
+  const b=CA.board2({W:560,H:280,xmin:-2.4,xmax:2.4,ymin:-2.2,ymax:2.2});
+  let s=curvatureBands(b,SHAPE)+CA.axes(b,{step:1})+CA.fnPlot(b,SHAPE,{color:'var(--q)'});
+  // 변곡선(f″=0 at x=0)
+  if(isStep2) s+=`<line x1="${b.X(0).toFixed(1)}" y1="${b.padT}" x2="${b.X(0).toFixed(1)}" y2="${(b.H-b.padB).toFixed(1)}" stroke="var(--hot)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${(b.X(0)+5).toFixed(1)}" y="${(b.padT+12)}" fill="var(--hot)" font-size="11" font-family="JetBrains Mono">변곡점 f″=0</text>`;
+  s+=`<line x1="${b.X(x).toFixed(1)}" y1="${b.padT}" x2="${b.X(x).toFixed(1)}" y2="${(b.H-b.padB).toFixed(1)}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="2 3"/>`;
+  s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(SHAPE(x)).toFixed(1)}" r="5.5" fill="var(--hot)"/>`;
+  document.getElementById(chartId).innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  return d2(SHAPE,x);
+}
+// STEP 1
+(function(){
+  let x=-1.5;
+  function render(){ const c=bandChart('chart1','info1',x,false);
+    document.getElementById('info1').innerHTML=
+      `<div class="ttl" style="color:${c>0?'var(--good)':'var(--k)'}">x=${VZ.fmt(x,1)} · f″=${VZ.fmt(c,2)}</div>
+       <p style="margin:0">${c>0?'<b style="color:var(--good)">볼록(그릇) 구간</b> — 초록 배경. 곡선이 아래로 그릇처럼 휘어요.':'<b style="color:var(--k)">오목(봉우리) 구간</b> — 코랄 배경. 곡선이 위로 봉긋 휘어요.'}</p>`; }
+  document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+// STEP 2
+(function(){
+  let x=-0.8;
+  function render(){ const c=bandChart('chart2','info2',x,true);
+    const near=Math.abs(x)<0.12;
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">x=${VZ.fmt(x,2)} · f″=${VZ.fmt(c,2)}</div>
+       <p style="margin:0">${near?'<b style="color:var(--hot)">변곡점 근처!</b> f″≈0 — 여기서 오목↔볼록이 뒤집혀요.':c>0?'볼록(f″>0). 더 왼쪽으로 가면 x=0 경계에서 부호가 바뀌어요.':'오목(f″<0). 더 오른쪽으로 가면 x=0 경계에서 부호가 바뀌어요.'}</p>`; }
+  document.getElementById('x2').oninput=e=>{ x=+e.target.value/100; document.getElementById('x2v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+</script>
+</body>
+</html>

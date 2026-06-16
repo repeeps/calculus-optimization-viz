@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 연쇄법칙 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .machine{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; margin:8px 0;}
+  .mbox{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:18px; padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); text-align:center; min-width:60px;}
+  .mfn{background:rgba(55,189,248,.12); border-color:var(--q); color:var(--q); font-size:13px;}
+  .marrow{color:var(--faint); font-size:18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 2 · Chapter 04</div>
+    <h1>연쇄법칙 — 함수 속의 함수, 기울기는 곱해진다</h1>
+    <p class="intro">함수를 <b>연달아</b> 통과시킬 때(합성), 전체의 기울기는 <b>각 단계 기울기의 곱</b>이에요. "x를 살짝 흔들면 중간값 u가 g′배 흔들리고, 그게 다시 f′배 흔들려 y가 된다" — 그래서 <b>dy/dx = f′ × g′</b>. 이 한 줄이 신경망 <b>역전파</b>의 전부예요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 직렬 기계</button>
+    <button data-s="1">01 · 흔들림이 곱해진다</button>
+    <button data-s="2">02 · 검증</button>
+    <button data-s="3">03 · 역전파</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Functions in Series</span>
+    <h2>두 기계를 직렬로 잇는다</h2>
+    <p class="lead">합성함수는 기계 두 대를 <b>직렬</b>로 연결한 거예요. x를 첫 기계 <b>g</b>에 넣어 중간값 <b>u</b>를 얻고, 그 u를 둘째 기계 <b>f</b>에 넣어 최종 <b>y</b>를 얻어요. 입력을 바꿔 값이 어떻게 흐르는지 보세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <span class="note">예:</span>
+      <button class="btn" id="pA">g: 제곱 → f: 2배</button>
+      <button class="btn" id="pB" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">g: +1 → f: 제곱</button>
+    </div>
+    <div class="ctrl"><label>입력 x</label><input type="range" id="x0" min="-200" max="200" value="120"><span class="val" id="x0v">1.2</span></div>
+    <div class="machine" id="machine0"></div>
+    <div id="info0" class="callout q"></div>
+    <p class="note" style="margin-top:12px">→ y는 x로부터 <b>두 단계</b>를 거쳐 나와요. 그럼 "x가 1 변할 때 y는 얼마나 변하나"(전체 기울기)는 어떻게 구할까요? 한 단계씩 따라가면 돼요(다음 스텝).</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Wiggles Multiply</span>
+    <h2>흔들림이 단계마다 배율로 전달된다</h2>
+    <p class="lead">x를 아주 살짝 흔들면 — 첫 기계가 그 흔들림을 <b>g′(x)배</b>로 키우거나 줄여 u로 보내고, 둘째 기계가 다시 <b>f′(u)배</b>로 바꿔 y로 보내요. 그래서 전체 배율 = <b>f′(u) × g′(x)</b>. 막대로 비교해 보세요.</p>
+    <div class="ctrl"><label>입력 x</label><input type="range" id="x1" min="-200" max="200" value="120"><span class="val" id="x1v">1.2</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 핵심: <b>dy/dx = f′(u) · g′(x)</b>. 마치 환율을 두 번 거치는 것과 같아요(원→달러→엔의 환율 = 두 환율의 곱). 분수처럼 보이는 dy/du · du/dx 가 약분되는 이유이기도 해요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Check It</span>
+    <h2>곱이 정말 전체 기울기와 같을까</h2>
+    <p class="lead">전체 합성함수 y=f(g(x))를 통째로 미분한 값과, <b>f′(u)·g′(x)</b>를 따로 곱한 값을 나란히 비교해요. 어떤 x에서도 둘이 <b>똑같아요</b>.</p>
+    <div class="ctrl"><label>입력 x</label><input type="range" id="x2" min="-200" max="200" value="80"><span class="val" id="x2v">0.8</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 곡선(주황 접선)이 합성함수 y=f(g(x))의 그 점 기울기이고, 그게 <b>두 단계 기울기의 곱</b>과 정확히 일치해요. 손으로 합성함수를 통째로 미분하지 않아도, 단계별 기울기만 곱하면 끝.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — This is Backprop</span>
+    <h2>깊게 쌓으면 그게 역전파</h2>
+    <p class="lead">신경망은 함수를 <b>수십~수백 단계</b> 합성한 거대한 합성함수예요. 각 층의 기울기를 <b>뒤에서 앞으로 곱해 가며</b> 전달하는 게 바로 <b>역전파(backpropagation)</b> — 연쇄법칙을 대규모로 반복하는 것뿐이에요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <span class="note">단계 수:</span>
+      <button class="btn" id="d2">2단계</button>
+      <button class="btn" id="d4" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">4단계</button>
+      <button class="btn" id="d6" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">6단계</button>
+    </div>
+    <div id="info3" class="callout good"></div>
+    <p class="note" style="margin-top:12px;color:var(--faint)">→ 각 단계 기울기가 1보다 작으면 곱이 <b>0으로 사그라들고</b>(기울기 소실), 1보다 크면 <b>폭발</b>해요. 깊은 신경망 학습의 큰 골칫거리가 여기서 싹터요. 그래도 "기울기 = 단계별 곱"이라는 연쇄법칙이 모든 학습의 엔진이에요.</p>
+    <div class="callout q" style="margin-top:14px"><p style="margin:0">→ 다음 <b>5장 2차도함수·볼록/오목</b>: 기울기의 기울기로 "그릇이 위로 열렸나"를 보고, 최적화가 잘 풀리는 지형을 가려요. · <a href="index.html">목차</a></p></div>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 기울기·곱은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 04 · 연쇄법칙');
+VZ.setupStepper();
+const CA = VZ.CA;
+const PRE = {
+  A: { g:x=>x*x,   f:u=>2*u,    gName:'제곱(x²)', fName:'2배(2u)', yName:'2x²' },
+  B: { g:x=>x+1,   f:u=>u*u,    gName:'+1',       fName:'제곱(u²)', yName:'(x+1)²' },
+};
+
+// ---------- STEP 0 : 직렬 기계 ----------
+(function(){
+  let kind='A', x=1.2;
+  function render(){
+    const P=PRE[kind], u=P.g(x), y=P.f(u);
+    document.getElementById('machine0').innerHTML =
+      `<div class="mbox">x<br>${VZ.fmt(x,1)}</div><span class="marrow">→</span><div class="mbox mfn">g<br>${P.gName}</div><span class="marrow">→</span><div class="mbox" style="color:var(--v);border-color:var(--v)">u<br>${VZ.fmt(u,2)}</div><span class="marrow">→</span><div class="mbox mfn">f<br>${P.fName}</div><span class="marrow">→</span><div class="mbox" style="color:var(--hot);border-color:var(--hot)">y<br>${VZ.fmt(y,2)}</div>`;
+    document.getElementById('info0').innerHTML =
+      `<div class="ttl" style="color:var(--q)">y = f(g(${VZ.fmt(x,1)})) = ${VZ.fmt(y,2)}</div><p style="margin:0">x=${VZ.fmt(x,1)} → g로 u=${VZ.fmt(u,2)} → f로 y=${VZ.fmt(y,2)}. 합성하면 y = ${P.yName}.</p>`;
+  }
+  function setK(k){ kind=k; [['pA','A'],['pB','B']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('pA').onclick=()=>setK('A');
+  document.getElementById('pB').onclick=()=>setK('B');
+  document.getElementById('x0').oninput=e=>{ x=+e.target.value/100; document.getElementById('x0v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  setK('A');
+})();
+
+// ---------- STEP 1 : 흔들림 막대 ----------
+(function(){
+  const P=PRE.A; let x=1.2;
+  function render(){
+    const u=P.g(x), gp=CA.deriv(P.g,x), fp=CA.deriv(P.f,u), prod=fp*gp;
+    // 막대 3개: |g'|, |f'|, |곱|
+    const W=560,H=210,base=160,maxv=Math.max(Math.abs(gp),Math.abs(fp),Math.abs(prod),1)*1.15;
+    const bar=(cx,val,col,lab,sub)=>{ const h=Math.abs(val)/maxv*130; const y=base-h;   // 크기(절댓값)는 위로, 부호는 숫자로
+      return `<rect x="${cx-34}" y="${y.toFixed(1)}" width="68" height="${h.toFixed(1)}" rx="4" fill="${col}" opacity="0.8"/>`
+        +`<line x1="${cx-50}" y1="${base}" x2="${cx+50}" y2="${base}" stroke="var(--line)"/>`
+        +`<text x="${cx}" y="${(y-6).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="14" font-weight="700" font-family="JetBrains Mono">${VZ.fmt(val,2)}</text>`
+        +`<text x="${cx}" y="${base+18}" text-anchor="middle" fill="var(--muted)" font-size="12" font-family="JetBrains Mono">${lab}</text>`
+        +`<text x="${cx}" y="${base+32}" text-anchor="middle" fill="var(--faint)" font-size="10" font-family="JetBrains Mono">${sub}</text>`; };
+    let g = bar(120,gp,'var(--q)',"g′(x)","1단계 배율") + bar(280,fp,'var(--v)',"f′(u)","2단계 배율")
+      + `<text x="200" y="${base-10}" text-anchor="middle" fill="var(--faint)" font-size="20">×</text>`
+      + bar(450,prod,'var(--hot)',"f′·g′","= dy/dx") + `<text x="365" y="${base-10}" text-anchor="middle" fill="var(--faint)" font-size="20">=</text>`;
+    document.getElementById('chart1').innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;display:block">${g}</svg>`;
+    document.getElementById('info1').innerHTML =
+      `<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,1)} · g′=${VZ.fmt(gp,2)} · f′(u)=${VZ.fmt(fp,2)} → 곱 = <b>${VZ.fmt(prod,2)}</b></div>
+       <p style="margin:0">x를 1 흔들면 u가 <b>${VZ.fmt(gp,2)}배</b>(=g′), 그 흔들림이 다시 <b>${VZ.fmt(fp,2)}배</b>(=f′)로 → y는 합쳐서 <b>${VZ.fmt(prod,2)}배</b> 흔들려요. <span style="color:var(--faint)">(막대는 크기, 배율이 음수면 흔들림이 <b>반대 방향</b>이라는 뜻)</span></p>`;
+  }
+  document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 검증 (합성 직접미분 vs 곱) ----------
+(function(){
+  const P=PRE.A; const comp = x=>P.f(P.g(x)); let x=0.8;
+  function render(){
+    const b=CA.board2({W:560,H:280,xmin:-2.2,xmax:2.2,ymin:-0.5,ymax:10.5});  // 2x²: f(2.2)=9.68 < 10.5
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,comp,{color:'var(--q)'})+CA.tangentLine(b,comp,x,{color:'var(--hot)'});
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const whole=CA.deriv(comp,x), u=P.g(x), prod=CA.deriv(P.f,u)*CA.deriv(P.g,x);
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">합성 직접 미분 = ${VZ.fmt(whole,3)} · f′(u)·g′(x) = ${VZ.fmt(prod,3)}</div>
+       <p style="margin:0">차이 ${VZ.fmt(Math.abs(whole-prod),4)} — 사실상 0. 둘은 항상 같아요. (이 예에선 y=2x²라 둘 다 4x=${VZ.fmt(4*x,2)})</p>`;
+  }
+  document.getElementById('x2').oninput=e=>{ x=+e.target.value/100; document.getElementById('x2v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 3 : 역전파(깊은 합성) ----------
+(function(){
+  let n=2;
+  function render(){
+    // 각 단계 기울기 예시(0.6~1.4 사이 고정 시퀀스)로 곱 누적
+    const grads=[0.7,1.2,0.9,1.3,0.6,1.1].slice(0,n);
+    let prod=1, chain=[]; grads.forEach(g=>{ prod*=g; chain.push(VZ.fmt(g,1)); });
+    document.getElementById('info3').innerHTML=
+      `<div class="ttl" style="color:var(--good)">${n}단계 합성 · 전체 기울기 = ${chain.join(' × ')} = <b>${VZ.fmt(prod,3)}</b></div>
+       <p style="margin:0">뒤에서 앞으로 각 단계 기울기를 <b>곱해</b> 입력까지 전달 — 이게 역전파예요. 단계가 늘수록 곱이 ${prod<1?'점점 작아지고(소실 위험)':'커지고(폭발 위험)'} 있죠.</p>`;
+  }
+  function setN(v){ n=v; [['d2',2],['d4',4],['d6',6]].forEach(([id,vv])=>{ document.getElementById(id).style.cssText = vv===v?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('d2').onclick=()=>setN(2);
+  document.getElementById('d4').onclick=()=>setN(4);
+  document.getElementById('d6').onclick=()=>setN(6);
+  setN(2);
+})();
+</script>
+</body>
+</html>
