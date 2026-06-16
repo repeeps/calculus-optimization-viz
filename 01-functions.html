@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>01 함수와 변화 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .machine{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin:10px 0;}
+  .mbox{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:22px; padding:12px 16px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); min-width:70px; text-align:center;}
+  .mfn{background:rgba(55,189,248,.12); border-color:var(--q); color:var(--q);}
+  .marrow{color:var(--faint); font-size:22px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 1 · Chapter 01</div>
+    <h1>함수와 변화 — 입력을 넣으면 출력이 나온다</h1>
+    <p class="intro">함수는 <b>입력 하나에 출력 하나</b>를 짝지어 주는 규칙이에요. 이걸 <b>그래프(곡선)</b>로 그리면 "입력이 변할 때 출력이 어떻게 변하나"가 한눈에 보이죠. 어떤 곳은 가파르고 어떤 곳은 평평해요 — 그 <b>가파름의 정도</b>가 다음 장에서 배울 미분의 씨앗이에요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 함수 = 기계</button>
+    <button data-s="1">01 · 그래프로 보기</button>
+    <button data-s="2">02 · 가파름 = 변화율</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — A Function is a Machine</span>
+    <h2>입력 x를 넣으면 출력 f(x)가 나온다</h2>
+    <p class="lead">함수 <b>f</b>는 숫자를 넣으면 정해진 규칙으로 바꿔 내보내는 <b>기계</b>예요. 같은 입력엔 항상 같은 출력 — 그게 함수의 약속이에요. 입력을 바꿔 보세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <span class="note">기계 f:</span>
+      <button class="btn" id="fSq">제곱 (x²)</button>
+      <button class="btn" id="fLin" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">2배 +1</button>
+      <button class="btn" id="fS" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">S자</button>
+    </div>
+    <div class="ctrl"><label>입력 x</label><input type="range" id="x0" min="-300" max="300" value="150"><span class="val" id="x0v">1.5</span></div>
+    <div class="machine" id="machine"></div>
+    <div id="info0" class="callout q"></div>
+    <p class="note" style="margin-top:12px">→ "입력 하나 → 출력 하나"가 핵심이에요. 입력을 쭉 바꿔가며 출력이 그리는 자취가 바로 <b>그래프</b>예요(다음 스텝).</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — The Graph</span>
+    <h2>입력·출력을 점으로 찍으면 곡선</h2>
+    <p class="lead">가로축 = 입력 x, 세로축 = 출력 f(x). 모든 (x, f(x)) 점을 찍어 이으면 <b>곡선</b>이 돼요. 점을 옮기며 곡선 위 어디에 있는지 봐요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="g_sq">x²</button>
+      <button class="btn" id="g_lin" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">2x+1</button>
+      <button class="btn" id="g_s" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">S자</button>
+    </div>
+    <div class="ctrl"><label>입력 x</label><input type="range" id="x1" min="-300" max="300" value="120"><span class="val" id="x1v">1.2</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 곡선의 한 점은 "이 입력을 넣으면 이 출력"을 뜻해요. 직선(2x+1)은 어디서나 똑같이 기울었지만, x²은 가운데가 평평하고 바깥이 가팔라요 — 이 차이가 다음 스텝의 주제예요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Steepness = Rate of Change</span>
+    <h2>같은 한 걸음인데, 어디선 많이 어디선 적게 변한다</h2>
+    <p class="lead">x를 똑같이 <b>Δx만큼</b> 옮겨도, 위치에 따라 출력이 변하는 양 <b>Δy</b>가 달라요. <b>평균변화율 = Δy ÷ Δx</b>(직각삼각형의 기울기). 점을 옮기며 삼각형이 가팔라지고 완만해지는 걸 보세요.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x2" min="-280" max="130" value="-200"><span class="val" id="x2v">−2.0</span></div>
+    <div class="ctrl"><label>한 걸음 Δx</label><input type="range" id="dx" min="20" max="130" value="100"><span class="val" id="dxv">1.0</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ x²에서 왼쪽 끝(가파른 내리막)은 같은 Δx여도 Δy가 크고, 가운데로 갈수록 완만해져요. <b>변화율이 위치마다 다르다</b> — 그래서 "그 점에서의 정확한 기울기"를 묻게 되고, 그게 <b>미분</b>이에요(2장). Δx를 잘게 줄이며 가운데(x=0)로 가면 변화율이 0에 다가가는 게 보여요(미분 맛보기).</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>함수, 그래프, 변화율</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">함수 = 입력→출력</div><p style="margin:0">입력 하나에 출력 하나. 입력을 쭉 바꾸면 곡선(그래프)을 그려요.</p></div>
+      <div class="callout v"><div class="ttl">가파름 = 변화율</div><p style="margin:0">두 점 사이 Δy/Δx가 평균변화율. 위치마다 달라요 — 직선만 어디서나 같아요.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">곡선에서 "평균"이 아니라 <b>딱 그 점에서의 기울기</b>는 얼마일까요? 두 점을 한없이 가깝게 붙이면 답이 나와요. 그게 다음 <b>2장 극한·순간변화율</b> — 미분의 출발이에요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="02-limits-derivative.html" style="color:var(--q);font-weight:700">CH 02 · 극한·순간변화율</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 곡선·변화율은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 01 · 함수와 변화');
+VZ.setupStepper();
+const CA = VZ.CA;
+const FNS = {
+  sq:  { f:x=>x*x,            name:'x²',    ymin:-1, ymax:9,  desc:'제곱' },
+  lin: { f:x=>2*x+1,          name:'2x+1',  ymin:-6, ymax:8,  desc:'2배 후 1 더하기' },
+  s:   { f:x=>6/(1+Math.exp(-1.6*x))-1, name:'S자', ymin:-2, ymax:6, desc:'S자(점점 차오르다 평평)' },
+};
+
+// ---------- STEP 0 : 기계 ----------
+(function(){
+  let kind='sq', x=1.5;
+  function render(){
+    const F=FNS[kind], y=F.f(x);
+    document.getElementById('machine').innerHTML =
+      `<div class="mbox">${x.toFixed(1)}</div><span class="marrow">→</span><div class="mbox mfn">f<br><span style="font-size:12px;font-weight:400">${F.name}</span></div><span class="marrow">→</span><div class="mbox" style="color:var(--hot);border-color:var(--hot)">${y.toFixed(2)}</div>`;
+    document.getElementById('info0').innerHTML =
+      `<div class="ttl" style="color:var(--q)">f(${x.toFixed(1)}) = ${y.toFixed(2)}</div><p style="margin:0">규칙: <b>${F.desc}</b>. 같은 입력 ${x.toFixed(1)}을 다시 넣으면 언제나 같은 ${y.toFixed(2)}이 나와요.</p>`;
+  }
+  function setK(k){ kind=k; [['fSq','sq'],['fLin','lin'],['fS','s']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('fSq').onclick=()=>setK('sq');
+  document.getElementById('fLin').onclick=()=>setK('lin');
+  document.getElementById('fS').onclick=()=>setK('s');
+  document.getElementById('x0').oninput=e=>{ x=+e.target.value/100; document.getElementById('x0v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  setK('sq');
+})();
+
+// ---------- STEP 1 : 그래프 ----------
+(function(){
+  let kind='sq', x=1.2;
+  function render(){
+    const F=FNS[kind], y=F.f(x);
+    const b=CA.board2({W:560,H:280,xmin:-3.2,xmax:3.2,ymin:F.ymin,ymax:F.ymax});
+    let g=CA.axes(b,{step:1});
+    g+=CA.fnPlot(b,F.f,{color:'var(--q)'});
+    // 점 + 안내선
+    g+=`<line x1="${b.X(x).toFixed(1)}" y1="${b.Y(F.ymin).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(y).toFixed(1)}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    g+=`<line x1="${b.X(b.xmin).toFixed(1)}" y1="${b.Y(y).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(y).toFixed(1)}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    g+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="5.5" fill="var(--hot)"/>`;
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${g}</svg>`;
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">점 (x, f(x)) = (${x.toFixed(1)}, ${y.toFixed(2)})</div><p style="margin:0">f(x)=${F.name}. 가로 ${x.toFixed(1)}로 가서 위/아래로 ${y.toFixed(2)}만큼 — 그 자리가 곡선 위 점이에요.</p>`;
+  }
+  function setK(k){ kind=k; [['g_sq','sq'],['g_lin','lin'],['g_s','s']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('g_sq').onclick=()=>setK('sq');
+  document.getElementById('g_lin').onclick=()=>setK('lin');
+  document.getElementById('g_s').onclick=()=>setK('s');
+  document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  setK('sq');
+})();
+
+// ---------- STEP 2 : 가파름 = 변화율 ----------
+(function(){
+  const f=x=>x*x; let x=-2.0, dx=1.0;
+  const b=CA.board2({W:560,H:280,xmin:-3.2,xmax:3.2,ymin:-1,ymax:9});
+  function render(){
+    const x2=x+dx, y1=f(x), y2=f(x2), dy=y2-y1, rate=dy/dx;
+    let g=CA.axes(b,{step:1});
+    g+=CA.fnPlot(b,f,{color:'var(--q)'});
+    // 직각삼각형: (x,y1)-(x2,y1)-(x2,y2)
+    g+=`<line x1="${b.X(x).toFixed(1)}" y1="${b.Y(y1).toFixed(1)}" x2="${b.X(x2).toFixed(1)}" y2="${b.Y(y1).toFixed(1)}" stroke="var(--muted)" stroke-width="2"/>`;       // Δx (run)
+    g+=`<line x1="${b.X(x2).toFixed(1)}" y1="${b.Y(y1).toFixed(1)}" x2="${b.X(x2).toFixed(1)}" y2="${b.Y(y2).toFixed(1)}" stroke="var(--hot)" stroke-width="2.5"/>`;     // Δy (rise)
+    g+=`<line x1="${b.X(x).toFixed(1)}" y1="${b.Y(y1).toFixed(1)}" x2="${b.X(x2).toFixed(1)}" y2="${b.Y(y2).toFixed(1)}" stroke="var(--v)" stroke-width="2" stroke-dasharray="5 3"/>`; // secant
+    g+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y1).toFixed(1)}" r="4.5" fill="var(--v)"/><circle cx="${b.X(x2).toFixed(1)}" cy="${b.Y(y2).toFixed(1)}" r="4.5" fill="var(--v)"/>`;
+    g+=`<text x="${((b.X(x)+b.X(x2))/2).toFixed(1)}" y="${(b.Y(y1)+16).toFixed(1)}" text-anchor="middle" fill="var(--muted)" font-size="11" font-family="JetBrains Mono">Δx=${dx.toFixed(1)}</text>`;
+    g+=`<text x="${(b.X(x2)+8).toFixed(1)}" y="${((b.Y(y1)+b.Y(y2))/2).toFixed(1)}" fill="var(--hot)" font-size="11" font-family="JetBrains Mono">Δy=${VZ.fmt(dy,1)}</text>`;
+    // 빗변(점선)이 곧 평균변화율(기울기)임을 표시
+    g+=`<text x="${((b.X(x)+b.X(x2))/2-6).toFixed(1)}" y="${((b.Y(y1)+b.Y(y2))/2-8).toFixed(1)}" text-anchor="end" fill="var(--v)" font-size="11" font-family="JetBrains Mono">기울기 ${VZ.fmt(rate,2)}</text>`;
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${g}</svg>`;
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">평균변화율 = Δy/Δx = ${VZ.fmt(dy,2)} / ${dx.toFixed(1)} = <b>${VZ.fmt(rate,2)}</b></div>
+       <p style="margin:0">x=${VZ.fmt(x,1)}→${VZ.fmt(x2,1)} 구간의 평균 기울기(빗변 점선의 기울기)예요. ${Math.abs(rate)<0.3?'거의 평평해요.':rate<0?'내리막(음의 변화율).':'오르막(양의 변화율).'} Δx를 작게 줄이면 "그 점만의" 기울기에 가까워져요(2장).</p>`;
+  }
+  document.getElementById('x2').oninput=e=>{ x=+e.target.value/100; document.getElementById('x2v').textContent=(x<0?'−':'')+Math.abs(x).toFixed(1); render(); };
+  document.getElementById('dx').oninput=e=>{ dx=+e.target.value/100; document.getElementById('dxv').textContent=dx.toFixed(1); render(); };
+  render();
+})();
+</script>
+</body>
+</html>
