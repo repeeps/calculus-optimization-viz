@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>00 미적분·최적화, 눈으로 보기 — 입문</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;}
+  .uc{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px; cursor:pointer; transition:.15s;}
+  .uc:hover{border-color:var(--q);}
+  .uc .reveal{display:none; margin-top:6px; font-size:12.5px; color:var(--muted); line-height:1.6;}
+  .uc.open .reveal{display:block;}
+  .cmap{display:grid; gap:8px;}
+  .cmrow{display:grid; grid-template-columns:84px 1fr; gap:12px; align-items:center; padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:var(--panel-2);}
+  .cmrow .pt{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">Intro · 왜 보는가</div>
+    <h1>미적분·최적화 — 기울기를 따라 가장 낮은 곳으로</h1>
+    <p class="intro">딥러닝이 "학습"한다는 건 결국 <b>손실(틀린 정도)을 가장 낮추는 값</b>을 찾는 일이에요. 그 길잡이가 <b>미분(기울기)</b>이고, 기울기 반대로 한 걸음씩 내려가는 게 <b>경사하강(최적화)</b>이죠. 이 코스는 수식을 외우는 대신, 기울기·넓이·최적화를 <b>직접 만지며 눈으로</b> 익혀요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 어디에나</button>
+    <button data-s="1">01 · 미분 = 기울기</button>
+    <button data-s="2">02 · 최적화 = 가장 낮은 곳</button>
+    <button data-s="3">03 · 코스 지도</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Everywhere</span>
+    <h2>미적분·최적화는 어디에 쓰이나</h2>
+    <p class="lead">"가장 좋은 값을 찾는다"는 문제는 도처에 있어요. 카드를 눌러 보세요.</p>
+    <div class="cards" id="useCards"></div>
+    <p class="note" style="margin-top:14px">→ 공통점: <b>어떤 값을 바꾸면 결과가 어떻게 변하나</b>(미분)를 보고, <b>가장 좋은 쪽으로 조금씩 이동</b>(최적화)해요. 이 코스의 척추는 <b>도함수 → 연쇄법칙 → 그래디언트 → 경사하강</b> 네 챕터예요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Slope</span>
+    <h2>미분 = 그 점의 기울기</h2>
+    <p class="lead">곡선 위 한 점에서 살짝 움직이면 얼마나 오르내리나 — 그 <b>기울기</b>가 바로 미분이에요. 점을 옮겨 보세요. <b>기울기가 +면 오르막, −면 내리막, 0이면 봉우리·골짜기</b>예요.</p>
+    <div class="ctrl"><label>점 위치 x</label><input type="range" id="x1" min="-330" max="330" value="-200"><span class="val" id="x1v">−2.0</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 핵심 한 줄: <b>내려가고 싶으면 기울기의 반대 방향으로 가면 돼요</b>(기울기가 +면 왼쪽, −면 오른쪽). 이게 다음 단계 경사하강의 전부예요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Roll Down</span>
+    <h2>최적화 = 공을 굴려 가장 낮은 곳으로</h2>
+    <p class="lead">기울기 반대로 한 걸음씩 — 공이 골짜기로 굴러내려가요. 출발점을 옮기고 <b>굴리기</b>를 눌러 보세요. <b>보폭(학습률)</b>을 너무 키우면 골짜기를 건너뛰며 <b>튕겨 나가요</b>.</p>
+    <div class="ctrl"><label>출발 x</label><input type="range" id="x0" min="-360" max="360" value="320"><span class="val" id="x0v">3.2</span></div>
+    <div class="ctrl"><label>보폭(학습률)</label><input type="range" id="lr" min="2" max="100" value="30"><span class="val" id="lrv">0.30</span></div>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="roll">▶ 굴리기</button>
+      <button class="btn" id="reset2" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 보폭이 작으면 느리지만 안전, 적당하면 골짜기로 쏙, 너무 크면 발산(튕김). "학습률을 어떻게 정하나"가 딥러닝 학습의 핵심 고민이에요(10·11장).</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Course Map</span>
+    <h2>이 코스에서 배울 것</h2>
+    <p class="lead">1변수 미분으로 "기울기"를 잡고, 다변수로 확장해 <b>그래디언트</b>를 얻은 뒤, 그걸로 <b>최적화</b>를 돌리고, 마지막에 적분·제약으로 넓혀요.</p>
+    <div class="cmap" id="courseMap"></div>
+    <p class="note" style="margin-top:16px">→ 첫 챕터로 가볼까요? <a href="01-functions.html" style="color:var(--q);font-weight:700">CH 01 · 함수와 변화</a>부터 시작하세요. (나머지는 순차 공개)</p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 곡선·기울기·경로는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', '00 · Intro');
+VZ.setupStepper();
+const CA = VZ.CA;
+
+// ---------- STEP 0 : 어디에나 ----------
+(function(){
+  const U = [
+    ['🤖','딥러닝 학습','신경망 학습 = 손실을 가장 낮추는 가중치 찾기. 그 길잡이가 기울기(경사하강).'],
+    ['📈','곡선 맞추기','데이터에 가장 잘 맞는 직선·곡선 = 오차를 최소로 하는 값(최소제곱·회귀).'],
+    ['📐','넓이·확률','곡선 아래 넓이를 쌓는 게 적분. 확률밀도를 적분하면 확률이 돼요.'],
+    ['💰','경제·물류','비용 최소·이익 최대·최단 경로 — 전부 "가장 좋은 값" 찾기(최적화).'],
+    ['🚀','공학·제어','로켓 궤적, 에너지 최소 경로… 변화율(미분)로 시스템을 설계해요.'],
+    ['🎮','게임·그래픽','부드러운 움직임·물리 시뮬레이션도 미분으로 속도·가속도를 다뤄요.'],
+  ];
+  document.getElementById('useCards').innerHTML = U.map(u=>
+    `<div class="uc"><div style="font-size:22px">${u[0]}</div><div style="font-weight:700;margin-top:4px;font-size:14px">${u[1]}</div><div class="reveal">${u[2]}</div><div class="note" style="font-size:11px;color:var(--faint);margin-top:6px">클릭 ▾</div></div>`).join('');
+  document.getElementById('useCards').addEventListener('click',e=>{ const c=e.target.closest('.uc'); if(c)c.classList.toggle('open'); });
+})();
+
+// ---------- STEP 1 : 미분 = 기울기 ----------
+(function(){
+  const f = x => 0.1*x*x*x - 0.6*x + 1;     // 기울기 0.3x²-0.6 → 부호가 바뀜
+  let xp = -2.0;
+  const b = CA.board2({W:560,H:280,xmin:-3.5,xmax:3.5,ymin:-2,ymax:4});
+  function render(){
+    const m = CA.deriv(f, xp);
+    let g = CA.axes(b,{step:1});
+    g += CA.fnPlot(b, f, {color:'var(--q)'});
+    g += CA.tangentLine(b, f, xp, {color:'var(--hot)'});
+    document.getElementById('chart1').innerHTML = `<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${g}</svg>`;
+    const dir = m>0.05?'오르막(기울기 +)':m<-0.05?'내리막(기울기 −)':'거의 평평(기울기 ≈ 0 — 봉우리/골짜기)';
+    document.getElementById('info1').innerHTML =
+      `<div class="ttl" style="color:var(--q)">x = ${xp.toFixed(1)} · 기울기 = <b>${m.toFixed(2)}</b></div>
+       <p style="margin:0">${dir}. 주황 직선(접선)의 기울기가 곧 그 점의 미분값이에요. <b>내려가려면 ${m>0?'왼쪽(−x)':'오른쪽(+x)'}으로</b>.</p>`;
+  }
+  document.getElementById('x1').oninput=e=>{ xp=+e.target.value/100; document.getElementById('x1v').textContent=(xp<0?'−':'')+Math.abs(xp).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 최적화 = 굴리기 ----------
+(function(){
+  const f = x => 0.2*x*x + 0.5;
+  let x0 = 3.2, lr = 0.30, cancel = null, path = null, shown = 0;
+  const b = CA.board2({W:560,H:280,xmin:-4.2,xmax:4.2,ymin:0,ymax:4.2});
+  function frame(k){
+    let g = CA.axes(b,{step:1});
+    g += CA.fnPlot(b, f, {color:'var(--q)'});
+    // 경로 점들
+    if(path){ for(let i=0;i<=k && i<path.length;i++){ const x=path[i][0];
+      g += `<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(f(x)).toFixed(1)}" r="${i===Math.min(k,path.length-1)?6:3}" fill="${i===Math.min(k,path.length-1)?'var(--hot)':'rgba(251,191,36,.45)'}"/>`; } }
+    else { g += `<circle cx="${b.X(x0).toFixed(1)}" cy="${b.Y(f(x0)).toFixed(1)}" r="6" fill="var(--hot)"/>`; }
+    document.getElementById('chart2').innerHTML = `<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${g}</svg>`;
+  }
+  function info(msg){ document.getElementById('info2').innerHTML = msg; }
+  function reset(){ if(cancel)cancel(); cancel=null; path=null; frame(0);
+    info(`<div class="ttl" style="color:var(--v)">출발 x=${x0.toFixed(1)} · 보폭 ${lr.toFixed(2)}</div><p style="margin:0">▶ 굴리기를 누르면 기울기 반대로 한 걸음씩 내려가요.</p>`); }
+  function roll(){ if(cancel)cancel();
+    path = CA.gradDescent(p=>[CA.deriv(f,p[0])], [x0], {lr, steps:40, clip:6});
+    cancel = CA.animatePath(path, (sub,i)=>{ frame(i);
+      const x=path[Math.min(i,path.length-1)][0], diverged=Math.abs(x)>4;
+      info(`<div class="ttl" style="color:var(--v)">${i+1}걸음 · x=${x.toFixed(2)} · 기울기 ${CA.deriv(f,x).toFixed(2)}</div>
+        <p style="margin:0">${diverged?'<b style="color:var(--k)">보폭이 너무 커서 튕겨 나갔어요!</b> 보폭을 줄여보세요.':Math.abs(CA.deriv(f,x))<0.05?'<b style="color:var(--good)">골짜기 도착!</b> 기울기 ≈ 0이라 멈춰요.':'기울기 반대로 내려가는 중…'}</p>`);
+    }, {interval:130});
+  }
+  document.getElementById('x0').oninput=e=>{ x0=+e.target.value/100; document.getElementById('x0v').textContent=(x0<0?'−':'')+Math.abs(x0).toFixed(1); reset(); };
+  document.getElementById('lr').oninput=e=>{ lr=+e.target.value/100; document.getElementById('lrv').textContent=lr.toFixed(2); reset(); };
+  document.getElementById('roll').onclick=roll;
+  document.getElementById('reset2').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 3 : 코스 지도 ----------
+(function(){
+  const MAP = [
+    ['PART 1','미분 직관','01 함수와 변화 · 02 극한·순간변화율 · 03 도함수','var(--q)'],
+    ['PART 2','미분 도구','04 연쇄법칙(→역전파) · 05 2차도함수·볼록/오목','var(--hot)'],
+    ['PART 3','다변수·그래디언트','06 다변수·등고선 · 07 편미분 · 08 그래디언트 · 09 방향도함수','var(--v)'],
+    ['PART 4','최적화 엔진','10 경사하강 · 11 학습률·모멘텀 · 12 볼록성 · 13 뉴턴법','var(--good)'],
+    ['PART 5','쌓기·제약','14 적분·리만합 · 15 미적분 기본정리 · 16 제약최적화','var(--pink)'],
+  ];
+  document.getElementById('courseMap').innerHTML = MAP.map(r=>
+    `<div class="cmrow"><div class="pt" style="color:${r[3]}">${r[0]}<br><span style="color:var(--muted);font-weight:400">${r[1]}</span></div><div style="font-size:13px">${r[2]}</div></div>`).join('');
+})();
+</script>
+</body>
+</html>
