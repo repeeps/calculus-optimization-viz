@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09 방향도함수 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; align-items:start;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .panellab{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace;margin:8px 0 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 3 · Chapter 09</div>
+    <h1>방향도함수 — 내가 고른 방향의 기울기</h1>
+    <p class="intro">편미분은 x축·y축 방향 기울기였어요. <b>방향도함수</b>는 "내가 고른 <b>아무 방향 û</b>으로 가면 얼마나 가파른가"예요. 핵심 공식은 단 하나: <b>그 방향 기울기 = ∇f · û</b>(그래디언트와 방향의 <b>내적</b>). 이걸로 ∇f 방향이 왜 "가장 가파른"지 정확히 설명돼요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 아무 방향의 기울기</button>
+    <button data-s="1">01 · 방향을 돌려보면</button>
+    <button data-s="2">02 · 최대·0·최소</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Slope in Any Direction</span>
+    <h2>방향 기울기 = ∇f · û (내적)</h2>
+    <p class="lead">단위 방향 <b>û</b>(길이 1 화살표)를 정하면, 그 방향의 기울기는 <b>그래디언트 ∇f를 û 위에 정사영</b>한 값이에요. 식으로는 ∇f·û(내적). 선대 11장의 내적이 여기 그대로 쓰여요.</p>
+    <div class="ctrl"><label>방향 각도</label><input type="range" id="ang0" min="0" max="360" value="30"><span class="val" id="ang0v">30°</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="map0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 주황은 ∇f(가장 가파른 방향), 파랑은 내가 고른 방향 û예요. û가 ∇f와 가까울수록 그 방향 기울기(내적)가 커지고, 직각이면 0이에요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Spin the Direction</span>
+    <h2>방향을 한 바퀴 돌리면 기울기는 코사인 곡선</h2>
+    <p class="lead">방향 각도를 0°→360° 돌리면 방향 기울기 ∇f·û가 <b>코사인 곡선</b>을 그려요. ∇f와 같은 각도에서 <b>꼭대기(최대)</b>, 직각에서 <b>0</b>, 반대에서 <b>골(최소)</b>이에요. 슬라이더로 돌려보세요.</p>
+    <div class="ctrl"><label>방향 각도</label><input type="range" id="ang1" min="0" max="360" value="30"><span class="val" id="ang1v">30°</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="twocol">
+      <div><div class="panellab">방향 û (지형 위)</div><div id="map1"></div></div>
+      <div><div class="panellab">각도 → 방향 기울기 (코사인)</div><div id="curve1"></div></div>
+    </div>
+    <p class="note" style="margin-top:12px">→ 곡선의 꼭대기 각도 = ∇f의 각도. "내적은 두 벡터가 나란할수록 크다"는 성질이 그대로 코사인으로 나타나요(∇f·û = |∇f|·cos(둘 사이 각)).</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Max · Zero · Min</span>
+    <h2>왜 ∇f가 "가장 가파른" 방향인가</h2>
+    <p class="lead">∇f·û = |∇f|·cos(각). cos는 <b>각=0(같은 방향)에서 1로 최대</b>, 90°(수직)에서 0, 180°(반대)에서 −1로 최소예요. 그래서 <b>∇f 방향이 최대 오르막, −∇f가 최대 내리막, 등고선 방향(수직)은 기울기 0</b>. 세 경우 버튼으로 확인하세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="cMax">∇f 방향(최대)</button>
+      <button class="btn" id="cZero" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">수직(0)</button>
+      <button class="btn" id="cMin" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">반대(최소)</button>
+    </div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="map2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 이게 경사하강의 근거예요: 가장 빨리 내려가려면 <b>−∇f</b>(180°)로 가면 돼요. 그리고 등고선을 따라(수직 방향) 걸으면 높이가 그대로(기울기 0)죠 — 그래서 등고선은 "같은 높이 선".</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>방향도함수가 묶어주는 것</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">∇f · û</div><p style="margin:0">아무 방향 기울기 = 그래디언트와 그 방향의 내적. 편미분 두 개로 모든 방향이 나와요.</p></div>
+      <div class="callout v"><div class="ttl">∇f가 최대인 이유</div><p style="margin:0">|∇f|·cos(각) — 같은 방향(각0)에서 최대, 수직 0, 반대 최소.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">여기까지가 다변수 미분(PART 3)이에요. <b>그래디언트가 가장 가파른 방향, −∇f가 가장 빠른 내리막</b>. 이제 그걸 따라 한 걸음씩 내려가기만 하면 돼요 — 다음 <b>10장 경사하강</b>이 머신러닝 학습의 심장입니다.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="10-gradient-descent.html" style="color:var(--q);font-weight:700">CH 10 · 경사하강</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 방향·내적은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 09 · 방향도함수');
+VZ.setupStepper();
+const CA = VZ.CA;
+const F = (x,y) => 0.3*x*x + 0.18*y*y + 0.16*x*y;
+const P = [-1.2, 1.1];                          // 고정 점
+const map = () => CA.board2({W:420,H:300,xmin:-3,xmax:3,ymin:-3,ymax:3,padL:14,padR:14,padT:14,padB:14});
+function arrowhead(x1,y1,x2,y2,col,sw){ sw=sw||2.5; const a=Math.atan2(y2-y1,x2-x1),h=6;
+  return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${sw}"/>`
+   +`<path d="M${x2.toFixed(1)},${y2.toFixed(1)} L${(x2-h*Math.cos(a-0.5)).toFixed(1)},${(y2-h*Math.sin(a-0.5)).toFixed(1)} M${x2.toFixed(1)},${y2.toFixed(1)} L${(x2-h*Math.cos(a+0.5)).toFixed(1)},${(y2-h*Math.sin(a+0.5)).toFixed(1)}" stroke="${col}" stroke-width="${sw}" fill="none"/>`; }
+function baseMap(ang){
+  const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+  const [gx,gy]=CA.gradient(F,P[0],P[1]); const gmag=Math.hypot(gx,gy)||1e-9; const X=b.X(P[0]),Y=b.Y(P[1]);
+  s+=arrowhead(X,Y, X+gx/gmag*52, Y-gy/gmag*52, 'var(--hot)');     // ∇f 방향(정규화)
+  if(ang!=null){ const a=ang*Math.PI/180; s+=arrowhead(X,Y, X+Math.cos(a)*52, Y-Math.sin(a)*52, 'var(--q)'); }
+  s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+  return {svg:`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`, gx, gy, gmag};
+}
+
+// ---------- STEP 0 ----------
+(function(){
+  let ang=30;
+  function render(){
+    const m=baseMap(ang); document.getElementById('map0').innerHTML=m.svg;
+    const a=ang*Math.PI/180, D=m.gx*Math.cos(a)+m.gy*Math.sin(a);
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:var(--q)">방향 ${ang}° 기울기 = ∇f·û = <b>${VZ.fmt(D,2)}</b></div>
+       <p style="margin:0">∇f=(${VZ.fmt(m.gx,2)}, ${VZ.fmt(m.gy,2)}), |∇f|=${VZ.fmt(m.gmag,2)}. ${D>0?'이 방향은 오르막':D<0?'이 방향은 내리막':'평평(등고선 방향)'}이에요.</p>`;
+  }
+  document.getElementById('ang0').oninput=e=>{ ang=+e.target.value; document.getElementById('ang0v').textContent=ang+'°'; render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 코사인 곡선 ----------
+(function(){
+  let ang=30;
+  function render(){
+    const m=baseMap(ang); document.getElementById('map1').innerHTML=m.svg;
+    // 각도 vs 방향기울기 곡선
+    const pts=[]; for(let d=0;d<=360;d+=4){ const a=d*Math.PI/180; pts.push([d, m.gx*Math.cos(a)+m.gy*Math.sin(a)]); }
+    const a=ang*Math.PI/180, Dnow=m.gx*Math.cos(a)+m.gy*Math.sin(a);
+    const ymin=-m.gmag*1.1, ymax=m.gmag*1.1;
+    let cv=VZ.linePlot([{pts,color:'var(--q)',label:'∇f·û'}],{W:360,H:230,xlab:'방향 각도(°)',ymin,ymax,xmin:0,xmax:360,legend:false,hline:{y:0,label:'0'}});
+    // 현재 각도 마커(점+세로선)를 곡선 위에 올림 — linePlot의 px/py 좌표계 재현
+    const pX=44+(ang/360)*(360-44-14), pY=230-34-((Dnow-ymin)/(ymax-ymin))*(230-14-34);
+    const marker=`<line x1="${pX.toFixed(1)}" y1="14" x2="${pX.toFixed(1)}" y2="196" stroke="var(--hot)" stroke-width="1" stroke-dasharray="3 3"/><circle cx="${pX.toFixed(1)}" cy="${pY.toFixed(1)}" r="5" fill="var(--hot)"/>`;
+    document.getElementById('curve1').innerHTML=cv.replace('</svg>', marker+'</svg>');
+    let peak=Math.atan2(m.gy,m.gx)*180/Math.PI; peak=((peak%360)+360)%360;
+    document.getElementById('info1').innerHTML=
+      `<div class="ttl" style="color:var(--q)">현재 ${ang}° → 기울기 ${VZ.fmt(Dnow,2)} · 최대는 ${VZ.fmt(peak,0)}° 부근(=∇f 각도)</div>
+       <p style="margin:0">곡선의 꼭대기(최대 기울기 ${VZ.fmt(m.gmag,2)})가 ∇f 방향, 골(${VZ.fmt(-m.gmag,2)})이 −∇f 방향이에요.</p>`;
+  }
+  document.getElementById('ang1').oninput=e=>{ ang=+e.target.value; document.getElementById('ang1v').textContent=ang+'°'; render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 최대·0·최소 ----------
+(function(){
+  function render(kind){
+    const [gx,gy]=CA.gradient(F,P[0],P[1]); const gAng=Math.atan2(gy,gx)*180/Math.PI;
+    let ang = kind==='max'?gAng : kind==='min'?gAng+180 : gAng+90;
+    ang=((ang%360)+360)%360;
+    const m=baseMap(ang); document.getElementById('map2').innerHTML=m.svg;
+    const a=ang*Math.PI/180, D=gx*Math.cos(a)+gy*Math.sin(a);
+    const lab = kind==='max'?'∇f와 같은 방향 → 최대 오르막':kind==='zero'?'∇f에 수직(등고선 방향) → 기울기 0':'∇f 반대(−∇f) → 최대 내리막';
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">${lab}</div><p style="margin:0">방향 기울기 ∇f·û = <b>${VZ.fmt(D,2)}</b>. (|∇f|=${VZ.fmt(Math.hypot(gx,gy),2)} → 최대 +${VZ.fmt(Math.hypot(gx,gy),2)}, 수직 0, 반대 −${VZ.fmt(Math.hypot(gx,gy),2)})</p>`;
+  }
+  function setK(k){ [['cMax','max'],['cZero','zero'],['cMin','min']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(k); }
+  document.getElementById('cMax').onclick=()=>setK('max');
+  document.getElementById('cZero').onclick=()=>setK('zero');
+  document.getElementById('cMin').onclick=()=>setK('min');
+  setK('max');
+})();
+</script>
+</body>
+</html>

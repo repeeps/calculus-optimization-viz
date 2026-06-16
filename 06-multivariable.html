@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 다변수·등고선 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 3 · Chapter 06</div>
+    <h1>다변수·등고선 — 입력이 둘이면 지형이 된다</h1>
+    <p class="intro">지금까지 입력이 하나(x)였어요. 이제 <b>둘(x, y)</b>이 되면, 출력 f(x,y)는 <b>지형의 높이</b>처럼 생각할 수 있어요. 위에서 내려다본 <b>등고선·지형도</b>로 보면, 봉우리·골짜기·가파른 비탈이 한눈에 보여요. 다변수 최적화는 이 지형에서 <b>가장 낮은 골</b>을 찾는 일이에요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 입력 둘 → 높이</button>
+    <button data-s="1">01 · 등고선·지형도</button>
+    <button data-s="2">02 · 높이 슬라이스</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Two Inputs, One Height</span>
+    <h2>(x, y) 한 쌍을 넣으면 높이 하나</h2>
+    <p class="lead">f(x, y)는 평면 위 각 위치 (x, y)에 <b>높이</b>를 하나씩 매겨요. 마치 산의 지형 같죠. 두 슬라이더로 위치를 옮기면 그 자리의 높이가 나와요(점 색이 높이).</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <span class="note">지형:</span>
+      <button class="btn" id="fBowl">그릇</button>
+      <button class="btn" id="fSaddle" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">안장</button>
+      <button class="btn" id="fHills" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">언덕·골</button>
+    </div>
+    <div class="ctrl"><label>위치 x</label><input type="range" id="px0" min="-280" max="280" value="-150"><span class="val" id="px0v">−1.5</span></div>
+    <div class="ctrl"><label>위치 y</label><input type="range" id="py0" min="-280" max="280" value="120"><span class="val" id="py0v">1.2</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 색이 높이예요(아래 범례). 1변수에선 곡선이었던 것이, 2변수에선 <b>색칠된 지형</b>이 돼요. 이 지형을 읽는 표준 방법이 <b>등고선</b>이에요(다음).</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Contour Map</span>
+    <h2>등고선: 같은 높이를 잇는 띠</h2>
+    <p class="lead">지도의 등고선처럼, 같은 높이는 같은 색 띠로 묶여요. <b>띠가 촘촘한 곳 = 가파른 비탈</b>, 듬성한 곳 = 완만해요. 닫힌 띠의 중심이 봉우리나 골이에요. 지형을 바꿔 모양을 비교해 보세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="cBowl">그릇</button>
+      <button class="btn" id="cSaddle" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">안장</button>
+      <button class="btn" id="cHills" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">언덕·골</button>
+    </div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ <b>그릇</b>은 동심원(중심이 최저), <b>안장</b>은 X자(한 방향은 오르고 한 방향은 내림), <b>언덕·골</b>은 봉우리와 골이 따로. 등고선만 봐도 지형의 골격이 보여요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Water Level</span>
+    <h2>물을 채우면 — 같은 높이가 물가(등고선)</h2>
+    <p class="lead">"높이 c 아래"를 물로 채워 보세요(파랑). 수위 c를 올리면 <b>낮은 골부터 잠겨요</b>. 물과 땅의 <b>경계선</b>이 바로 높이 c의 <b>등고선</b>이에요. 골이 여러 개면 따로따로 잠기다 이어지죠.</p>
+    <div class="ctrl"><label>수위 c</label><input type="range" id="lvl" min="0" max="100" value="35"><span class="val" id="lvlv">0.35</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ "높이 c 아래 영역"을 수학에선 <b>하위준위집합</b>이라 불러요. 최적화는 결국 이 물을 한없이 빼서 <b>가장 마지막에 남는 가장 깊은 골</b>을 찾는 일이에요. 그 골로 가는 방향을 알려주는 게 다음 그래디언트예요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>지형으로 보는 다변수 함수</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">f(x,y) = 높이</div><p style="margin:0">입력 한 쌍 → 높이 하나. 위에서 보면 색칠된 지형.</p></div>
+      <div class="callout v"><div class="ttl">등고선이 골격</div><p style="margin:0">같은 높이 띠. 촘촘=가파름, 닫힌 중심=봉우리·골.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">이제 "어느 방향으로 가면 가장 빨리 내려가나"가 핵심 질문이에요. 그러려면 먼저 <b>한 방향씩</b> 기울기를 재야 해요(7장 편미분). 그 방향별 기울기를 모으면 <b>그래디언트</b>(8장)가 나오고, 그걸로 <b>경사하강</b>(10장)을 돌려요. 머신러닝의 손실 지형도 정확히 이런 다변수 지형이에요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="07-partial.html" style="color:var(--q);font-weight:700">CH 07 · 편미분</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 지형·등고선은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 06 · 다변수·등고선');
+VZ.setupStepper();
+const CA = VZ.CA;
+const FIELDS = {
+  bowl:   { F:(x,y)=>0.5*(x*x+y*y),                      name:'그릇',    desc:'중심이 가장 낮은 골' },
+  saddle: { F:(x,y)=>0.4*(x*x-y*y),                      name:'안장',    desc:'한 방향 오르막·한 방향 내리막' },
+  hills:  { F:(x,y)=>-1.6*(Math.exp(-((x-1.3)**2+(y-1)**2)) + 0.8*Math.exp(-((x+1.3)**2+(y+0.8)**2))) + 0.12*(x*x+y*y),
+            name:'언덕·골', desc:'골 두 개(깊이 다름)' },
+};
+function board2(){ return CA.board2({W:420,H:300,xmin:-3,xmax:3,ymin:-3,ymax:3,padL:14,padR:14,padT:14,padB:14}); }
+function heightLegend(F,b){
+  // 범례: 지도와 같은 '띠(밴드)'로 + 실제 높이 숫자. levels는 지도와 맞춤(여기선 시각 동일하게 10밴드)
+  let lo=Infinity,hi=-Infinity;
+  for(let i=0;i<24;i++)for(let j=0;j<24;j++){const x=-3+6*i/23,y=-3+6*j/23,v=F(x,y); if(isFinite(v)){lo=Math.min(lo,v);hi=Math.max(hi,v);}}
+  const N=10; let bands='';
+  for(let k=0;k<N;k++) bands+='<span style="display:inline-block;width:12px;height:10px;background:'+CA.heatColor(k/(N-1))+'"></span>';
+  return '<div class="legend" style="display:flex;align-items:center;gap:6px;margin-top:6px">낮음('+VZ.fmt(lo,1)+')<span style="display:inline-flex;border-radius:4px;overflow:hidden">'+bands+'</span>높음('+VZ.fmt(hi,1)+')</div>';
+}
+
+// ---------- STEP 0 ----------
+(function(){
+  let kind='bowl', px=-1.5, py=1.2;
+  function render(){
+    const F=FIELDS[kind].F, b=board2();
+    let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:11});
+    // 점(위치) — 흰 테두리 원
+    s+=`<circle cx="${b.X(px).toFixed(1)}" cy="${b.Y(py).toFixed(1)}" r="6" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`+heightLegend(F,b);
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:var(--q)">f(${VZ.fmt(px,1)}, ${VZ.fmt(py,1)}) = <b>${VZ.fmt(F(px,py),2)}</b></div><p style="margin:0">${FIELDS[kind].name} 지형 — ${FIELDS[kind].desc}. 점을 옮기면 색(높이)이 달라져요.</p>`;
+  }
+  function setK(k){ kind=k; [['fBowl','bowl'],['fSaddle','saddle'],['fHills','hills']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('fBowl').onclick=()=>setK('bowl');
+  document.getElementById('fSaddle').onclick=()=>setK('saddle');
+  document.getElementById('fHills').onclick=()=>setK('hills');
+  document.getElementById('px0').oninput=e=>{ px=+e.target.value/100; document.getElementById('px0v').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py0').oninput=e=>{ py=+e.target.value/100; document.getElementById('py0v').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  setK('bowl');
+})();
+
+// ---------- STEP 1 : 등고선 ----------
+(function(){
+  let kind='bowl';
+  function render(){
+    const F=FIELDS[kind].F, b=board2();
+    let s=CA.contourGrid(b,F,{nx:46,ny:34,levels:9});
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`+heightLegend(F,b);
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">${FIELDS[kind].name}</div><p style="margin:0">${FIELDS[kind].desc}. 색 띠가 등고선이에요 — 띠가 촘촘할수록 가파른 비탈.</p>`;
+  }
+  function setK(k){ kind=k; [['cBowl','bowl'],['cSaddle','saddle'],['cHills','hills']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('cBowl').onclick=()=>setK('bowl');
+  document.getElementById('cSaddle').onclick=()=>setK('saddle');
+  document.getElementById('cHills').onclick=()=>setK('hills');
+  setK('bowl');
+})();
+
+// ---------- STEP 2 : 수위(하위준위집합) ----------
+(function(){
+  const F=FIELDS.hills.F; let c=0.35;
+  // 실제 높이 범위로 수위 매핑
+  let lo=Infinity,hi=-Infinity; for(let i=0;i<40;i++)for(let j=0;j<40;j++){const x=-3+6*i/39,y=-3+6*j/39,v=F(x,y);lo=Math.min(lo,v);hi=Math.max(hi,v);}
+  function render(){
+    const b=board2(); const level=lo+(hi-lo)*c;
+    const nx=46,ny=34,cw=b.plotW/nx,ch=b.plotH/ny; let flooded=0,tot=0; let s='';
+    for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){
+      const x=b.xmin+(b.xmax-b.xmin)*(i+0.5)/nx, y=b.ymax-(b.ymax-b.ymin)*(j+0.5)/ny, v=F(x,y); tot++;
+      const under=v<level; if(under)flooded++;
+      const col = under ? 'rgba(55,189,248,.55)' : CA.heatColor((v-lo)/(hi-lo));
+      s+=`<rect x="${(b.padL+i*cw).toFixed(1)}" y="${(b.padT+j*ch).toFixed(1)}" width="${(cw+0.6).toFixed(1)}" height="${(ch+0.6).toFixed(1)}" fill="${col}" opacity="0.9"/>`;
+    }
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">수위 높이 = ${VZ.fmt(level,2)} · 잠긴 면적 ${(100*flooded/tot).toFixed(0)}%</div>
+       <p style="margin:0">파랑이 "높이 ${VZ.fmt(level,2)} 아래"예요. 물과 땅의 경계가 그 높이의 <b>등고선</b>. 수위를 올리면 ${c<0.4?'깊은 골부터 잠겨요.':'두 골이 점점 이어져요.'}</p>`;
+  }
+  document.getElementById('lvl').oninput=e=>{ c=+e.target.value/100; document.getElementById('lvlv').textContent=c.toFixed(2); render(); };
+  render();
+})();
+</script>
+</body>
+</html>

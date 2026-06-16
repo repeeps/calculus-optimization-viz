@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07 편미분 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; align-items:start;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .panellab{font-size:12px;color:var(--faint);font-family:'JetBrains Mono',monospace;margin:8px 0 2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 3 · Chapter 07</div>
+    <h1>편미분 — 한 방향만 보고 기울기 재기</h1>
+    <p class="intro">입력이 둘이면 "기울기"도 방향에 따라 달라요. <b>편미분</b>은 "<b>다른 변수는 고정</b>하고 한 축 방향으로만" 잰 기울기예요. y를 묶어두고 x만 움직이면 ∂f/∂x, x를 묶고 y만 움직이면 ∂f/∂y. 지형을 한 방향으로 <b>칼로 잘라</b> 단면 곡선의 기울기를 보는 거죠.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 한 방향 자르기</button>
+    <button data-s="1">01 · ∂f/∂x · ∂f/∂y</button>
+    <button data-s="2">02 · 둘로 충분할까</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Slice One Way</span>
+    <h2>다른 변수는 고정, 한 축만 움직인다</h2>
+    <p class="lead">지형을 <b>x축 방향으로 한 줄</b> 잘라보면(y 고정), 그 단면은 <b>1변수 곡선</b>이에요. 그 곡선의 기울기가 바로 <b>∂f/∂x</b>. 자르는 위치(y)와 점(x)을 옮겨보세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="dirX">x 방향 자르기</button>
+      <button class="btn" id="dirY" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">y 방향 자르기</button>
+    </div>
+    <div class="ctrl"><label>점 x</label><input type="range" id="px" min="-260" max="260" value="-140"><span class="val" id="pxv">−1.4</span></div>
+    <div class="ctrl"><label>점 y</label><input type="range" id="py" min="-260" max="260" value="100"><span class="val" id="pyv">1.0</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="twocol">
+      <div><div class="panellab">위에서 본 지형 + 자른 선</div><div id="map0"></div></div>
+      <div><div class="panellab">자른 단면(1변수 곡선) + 접선</div><div id="slice0"></div></div>
+    </div>
+    <p class="note" style="margin-top:12px">→ 단면 곡선의 접선 기울기가 그 방향 편미분이에요. 자르는 방향을 바꾸면(위 토글) 기울기가 달라지죠 — 같은 점이라도 보는 방향에 따라 기울기가 다른 게 다변수의 핵심이에요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Both Partials</span>
+    <h2>두 방향 기울기를 한 점에서</h2>
+    <p class="lead">한 점 P에서 <b>∂f/∂x</b>(x로 자른 기울기)와 <b>∂f/∂y</b>(y로 자른 기울기)를 동시에 봐요. 둘은 보통 <b>다른 값</b>이에요. 점을 옮겨 두 편미분이 어떻게 바뀌는지 보세요.</p>
+    <div class="ctrl"><label>점 x</label><input type="range" id="px1" min="-260" max="260" value="120"><span class="val" id="px1v">1.2</span></div>
+    <div class="ctrl"><label>점 y</label><input type="range" id="py1" min="-260" max="260" value="-100"><span class="val" id="py1v">−1.0</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="map1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ ∂f/∂x는 "오른쪽으로 가면 얼마나 오르나", ∂f/∂y는 "위로 가면 얼마나 오르나". 두 화살표(파랑=x, 보라=y)의 길이·방향이 각 편미분이에요. 둘을 합치면 다음 장 <b>그래디언트</b>가 돼요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Are Two Enough?</span>
+    <h2>축 방향 둘만으로 모든 방향을 알까?</h2>
+    <p class="lead">편미분은 <b>x축·y축</b> 두 방향만 재요. 하지만 우리가 갈 수 있는 방향은 <b>무한히</b> 많죠(대각선 등). 놀랍게도, 이 <b>두 개만 알면</b> 임의 방향의 기울기를 전부 계산할 수 있어요 — 그 비밀이 그래디언트(8장)와 방향도함수(9장)예요.</p>
+    <div class="ctrl"><label>탐색 방향(각도)</label><input type="range" id="ang" min="0" max="360" value="45"><span class="val" id="angv">45°</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="map2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 임의 방향(주황)의 기울기는 사실 <b>∂f/∂x·(가로 성분) + ∂f/∂y·(세로 성분)</b>이에요. 즉 두 편미분의 <b>가중합</b>! 그래서 두 개만 있으면 충분해요. 이 식이 9장 방향도함수의 핵심이에요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>편미분이 알려주는 것</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">∂f/∂x, ∂f/∂y</div><p style="margin:0">다른 변수 고정 → 한 축만 미분. 지형을 한 방향으로 자른 단면의 기울기.</p></div>
+      <div class="callout v"><div class="ttl">두 개로 충분</div><p style="margin:0">임의 방향 기울기 = 두 편미분의 가중합. 다음 장에서 벡터로 묶어요.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">편미분 두 개를 <b>한 벡터</b>로 묶은 게 <b>그래디언트 ∇f = (∂f/∂x, ∂f/∂y)</b>예요. 이 벡터가 "가장 가파른 오르막 방향"을 가리키고, 등고선에 수직이에요. 경사하강은 그 반대로 내려가죠. 다음 <b>8장</b>에서 봅니다.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="08-gradient.html" style="color:var(--q);font-weight:700">CH 08 · 그래디언트</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 단면·편미분은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 07 · 편미분');
+VZ.setupStepper();
+const CA = VZ.CA;
+const F = (x,y) => 0.3*x*x + 0.18*y*y + 0.16*x*y;   // 기울어진 그릇
+const map = () => CA.board2({W:360,H:300,xmin:-3,xmax:3,ymin:-3,ymax:3,padL:14,padR:14,padT:14,padB:14});
+
+// ---------- STEP 0 : 한 방향 자르기 ----------
+(function(){
+  let dir='x', px=-1.4, py=1.0;
+  function render(){
+    const b=map();
+    let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    // 자른 선
+    if(dir==='x') s+=`<line x1="${b.X(b.xmin).toFixed(1)}" y1="${b.Y(py).toFixed(1)}" x2="${b.X(b.xmax).toFixed(1)}" y2="${b.Y(py).toFixed(1)}" stroke="#fff" stroke-width="2" stroke-dasharray="5 3"/>`;
+    else s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(b.ymin).toFixed(1)}" x2="${b.X(px).toFixed(1)}" y2="${b.Y(b.ymax).toFixed(1)}" stroke="#fff" stroke-width="2" stroke-dasharray="5 3"/>`;
+    s+=`<circle cx="${b.X(px).toFixed(1)}" cy="${b.Y(py).toFixed(1)}" r="6" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    // 단면 곡선
+    const g = dir==='x' ? (t=>F(t,py)) : (t=>F(px,t));
+    const at = dir==='x' ? px : py;
+    const sb=CA.board2({W:360,H:300,xmin:-3,xmax:3,ymin:-0.5,ymax:6});
+    let ss=CA.axes(sb,{step:1})+CA.fnPlot(sb,g,{color:'var(--q)'})+CA.tangentLine(sb,g,at,{color:'var(--hot)'});
+    document.getElementById('slice0').innerHTML=`<svg width="${sb.W}" height="${sb.H}" viewBox="0 0 ${sb.W} ${sb.H}" style="max-width:100%;display:block">${ss}</svg>`;
+    const pd = CA.gradient(F,px,py)[dir==='x'?0:1];
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:var(--q)">점(${VZ.fmt(px,1)}, ${VZ.fmt(py,1)}) · ${dir==='x'?'∂f/∂x':'∂f/∂y'} = <b>${VZ.fmt(pd,2)}</b></div>
+       <p style="margin:0">${dir==='x'?'y='+VZ.fmt(py,1)+'로 고정하고 x만 움직인 단면':'x='+VZ.fmt(px,1)+'로 고정하고 y만 움직인 단면'}. 오른쪽 곡선의 접선 기울기가 그 편미분이에요.</p>`;
+  }
+  function setD(d){ dir=d; [['dirX','x'],['dirY','y']].forEach(([id,dd])=>{ document.getElementById(id).style.cssText = dd===d?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('dirX').onclick=()=>setD('x');
+  document.getElementById('dirY').onclick=()=>setD('y');
+  document.getElementById('px').oninput=e=>{ px=+e.target.value/100; document.getElementById('pxv').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py').oninput=e=>{ py=+e.target.value/100; document.getElementById('pyv').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  setD('x');
+})();
+
+// ---------- STEP 1 : 두 편미분 화살표 ----------
+(function(){
+  let px=1.2, py=-1.0;
+  function render(){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    const [gx,gy]=CA.gradient(F,px,py);
+    const X=b.X(px), Y=b.Y(py), sc=12;  // 화살표 픽셀 스케일(코너 클리핑 방지)
+    s+=VZ.LA.arrowPx(X,Y, X+gx*sc, Y, 'var(--q)');   // ∂f/∂x (가로)
+    s+=VZ.LA.arrowPx(X,Y, X, Y-gy*sc, 'var(--v)');   // ∂f/∂y (세로, 화면 위가 +y)
+    s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info1').innerHTML=
+      `<div class="ttl" style="color:var(--q)">점(${VZ.fmt(px,1)}, ${VZ.fmt(py,1)}) · <span style="color:var(--q)">∂f/∂x=${VZ.fmt(gx,2)}</span> · <span style="color:var(--v)">∂f/∂y=${VZ.fmt(gy,2)}</span></div>
+       <p style="margin:0">파랑(가로)=x방향 기울기, 보라(세로)=y방향 기울기. 길이가 길수록 그 방향으로 가파르게 올라요. 둘이 다르죠?</p>`;
+  }
+  document.getElementById('px1').oninput=e=>{ px=+e.target.value/100; document.getElementById('px1v').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py1').oninput=e=>{ py=+e.target.value/100; document.getElementById('py1v').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 임의 방향 = 가중합 ----------
+(function(){
+  const px=1.0, py=-0.6; let ang=45;
+  function render(){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    const [gx,gy]=CA.gradient(F,px,py);
+    const a=ang*Math.PI/180, ux=Math.cos(a), uy=Math.sin(a);
+    const dirDeriv = gx*ux + gy*uy;   // 방향도함수 = ∇f·û
+    const X=b.X(px), Y=b.Y(py), L=46;
+    // 방향 화살표(주황)
+    s+=VZ.LA.arrowPx(X,Y, X+ux*L, Y-uy*L, 'var(--hot)');
+    // 성분 가이드(가로/세로 점선)
+    s+=`<line x1="${X.toFixed(1)}" y1="${Y.toFixed(1)}" x2="${(X+ux*L).toFixed(1)}" y2="${Y.toFixed(1)}" stroke="var(--q)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    s+=`<line x1="${(X+ux*L).toFixed(1)}" y1="${Y.toFixed(1)}" x2="${(X+ux*L).toFixed(1)}" y2="${(Y-uy*L).toFixed(1)}" stroke="var(--v)" stroke-width="1" stroke-dasharray="3 3"/>`;
+    s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info2').innerHTML=
+      `<div class="ttl" style="color:var(--v)">방향 ${ang}° 의 기울기 = ∂f/∂x·${VZ.fmt(ux,2)} + ∂f/∂y·${VZ.fmt(uy,2)} = <b>${VZ.fmt(dirDeriv,2)}</b></div>
+       <p style="margin:0">∂f/∂x=${VZ.fmt(gx,2)}, ∂f/∂y=${VZ.fmt(gy,2)}. 주황 방향의 가로 성분(${VZ.fmt(ux,2)})·세로 성분(${VZ.fmt(uy,2)})을 편미분에 곱해 더하면 그 방향 기울기예요.</p>`;
+  }
+  document.getElementById('ang').oninput=e=>{ ang=+e.target.value; document.getElementById('angv').textContent=ang+'°'; render(); };
+  render();
+})();
+</script>
+</body>
+</html>

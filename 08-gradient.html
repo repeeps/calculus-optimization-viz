@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>08 그래디언트 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 3 · Chapter 08</div>
+    <h1>그래디언트 — 가장 가파른 오르막을 가리키는 화살표</h1>
+    <p class="intro">편미분 둘을 <b>한 벡터</b>로 묶은 게 <b>그래디언트 ∇f = (∂f/∂x, ∂f/∂y)</b>예요. 이 화살표는 놀라운 성질이 있어요: <b>그 지점에서 가장 가파르게 오르는 방향</b>을 가리키고, 항상 <b>등고선에 수직</b>이에요. 그래서 경사하강은 그저 <b>−∇f(반대 방향)</b>으로 내려가면 돼요 — 머신러닝 학습의 핵심.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 편미분을 묶다</button>
+    <button data-s="1">01 · 등고선에 수직</button>
+    <button data-s="2">02 · 가장 가파른 방향</button>
+    <button data-s="3">03 · −∇f로 내려간다</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Bundle the Partials</span>
+    <h2>∇f = (∂f/∂x, ∂f/∂y)</h2>
+    <p class="lead">7장의 두 편미분을 가로·세로 성분으로 갖는 <b>벡터 하나</b>로 묶으면 그래디언트예요. 이 화살표의 <b>방향</b>은 "가장 빨리 오르는 쪽", <b>길이</b>는 "얼마나 가파른가"를 뜻해요.</p>
+    <div class="ctrl"><label>점 x</label><input type="range" id="px0" min="-260" max="260" value="-130"><span class="val" id="px0v">−1.3</span></div>
+    <div class="ctrl"><label>점 y</label><input type="range" id="py0" min="-260" max="260" value="-160"><span class="val" id="py0v">−1.6</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="map0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 파랑(∂f/∂x)·보라(∂f/∂y) 두 성분을 더한 대각선 화살표가 <b>그래디언트(주황)</b>예요. 두 편미분의 합벡터죠. 점을 옮기면 화살표가 따라 움직여요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Perpendicular to Contours</span>
+    <h2>그래디언트는 등고선에 수직이다</h2>
+    <p class="lead">신기하게도 ∇f 화살표(주황)는 어디서나 <b>등고선(색 띠)에 직각</b>이에요. 당연하죠 — 등고선을 따라가면 높이가 안 변하고(기울기 0), 거기에 수직인 방향이 가장 빠르게 높이가 바뀌니까요. 점을 옮기며 확인하세요.</p>
+    <div class="ctrl"><label>점 x</label><input type="range" id="px1" min="-260" max="260" value="150"><span class="val" id="px1v">1.5</span></div>
+    <div class="ctrl"><label>점 y</label><input type="range" id="py1" min="-260" max="260" value="-50"><span class="val" id="py1v">−0.5</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="map1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 회색 짧은 선은 그 점의 <b>등고선 방향</b>(접선)이에요. 주황 ∇f가 거기에 항상 직각이죠. 등고선을 가로질러야 높이가 빨리 바뀌니, 가장 가파른 방향은 등고선에 수직일 수밖에 없어요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Steepest Direction</span>
+    <h2>여러 방향으로 쏴 보면 ∇f가 가장 길다</h2>
+    <p class="lead">한 점에서 <b>여러 방향</b>으로 "그 방향 기울기"를 재 봐요(부채살). <span style="color:var(--good)">초록=오르막</span>, <span style="color:var(--k)">코랄=내리막</span>, 길수록 가파름. <b>그래디언트(주황) 방향이 가장 긴 초록</b> — 즉 가장 가파른 오르막이에요.</p>
+    <div class="ctrl"><label>점 x</label><input type="range" id="px2" min="-240" max="240" value="-120"><span class="val" id="px2v">−1.2</span></div>
+    <div class="ctrl"><label>점 y</label><input type="range" id="py2" min="-240" max="240" value="140"><span class="val" id="py2v">1.4</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="map2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 부채살 중 ∇f(주황)에 가장 가까운 초록살이 가장 길어요(가장 가파른 오르막). 정반대(코랄)는 가장 가파른 <b>내리막</b> — 바로 <b>−∇f</b>, 경사하강이 가는 방향이죠.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Descend by −∇f</span>
+    <h2>내려가려면 그래디언트 반대로</h2>
+    <p class="lead">가장 빨리 <b>오르는</b> 방향이 ∇f니까, 가장 빨리 <b>내려가는</b> 방향은 <b>−∇f</b>예요. 그 방향으로 한 걸음씩 가는 게 경사하강이에요. ▶로 공을 굴려보세요(−∇f 따라 골로).</p>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="roll">▶ −∇f로 굴리기</button>
+      <button class="btn" id="reset3" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info3" class="callout good"></div>
+    <div class="chart-wrap" id="map3" style="margin-top:10px"></div>
+    <div class="callout q" style="margin-top:14px"><p style="margin:0">→ 선대에서 배운 <b>벡터</b>가 여기 그대로 쓰여요(∇f는 벡터). 다음 <b>9장 방향도함수</b>에선 "임의 방향의 기울기 = ∇f와 그 방향의 내적"임을 봐요 — 왜 ∇f 방향이 최대인지 수학적으로 확인하죠. · <a href="index.html">목차</a></p></div>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 그래디언트·경로는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 08 · 그래디언트');
+VZ.setupStepper();
+const CA = VZ.CA;
+const F = (x,y) => 0.3*x*x + 0.18*y*y + 0.16*x*y;
+const map = () => CA.board2({W:420,H:320,xmin:-3,xmax:3,ymin:-3,ymax:3,padL:14,padR:14,padT:14,padB:14});
+function arrowhead(x1,y1,x2,y2,col){ const a=Math.atan2(y2-y1,x2-x1),h=6;
+  return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="2.5"/>`
+   +`<path d="M${x2.toFixed(1)},${y2.toFixed(1)} L${(x2-h*Math.cos(a-0.5)).toFixed(1)},${(y2-h*Math.sin(a-0.5)).toFixed(1)} M${x2.toFixed(1)},${y2.toFixed(1)} L${(x2-h*Math.cos(a+0.5)).toFixed(1)},${(y2-h*Math.sin(a+0.5)).toFixed(1)}" stroke="${col}" stroke-width="2.5" fill="none"/>`; }
+
+// ---------- STEP 0 : 편미분 합벡터 ----------
+(function(){
+  let px=-1.3, py=-1.6;
+  function render(){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    const [gx,gy]=CA.gradient(F,px,py); const X=b.X(px),Y=b.Y(py),sc=20;
+    s+=`<line x1="${X}" y1="${Y}" x2="${(X+gx*sc).toFixed(1)}" y2="${Y}" stroke="var(--q)" stroke-width="2" stroke-dasharray="3 3"/>`;
+    s+=`<line x1="${(X+gx*sc).toFixed(1)}" y1="${Y}" x2="${(X+gx*sc).toFixed(1)}" y2="${(Y-gy*sc).toFixed(1)}" stroke="var(--v)" stroke-width="2" stroke-dasharray="3 3"/>`;
+    s+=arrowhead(X,Y, X+gx*sc, Y-gy*sc, 'var(--hot)');
+    s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:var(--q)">∇f = (${VZ.fmt(gx,2)}, ${VZ.fmt(gy,2)}) · 가파름(길이)=${VZ.fmt(Math.hypot(gx,gy),2)}</div><p style="margin:0">파랑·보라 두 편미분 성분을 더한 주황 화살표가 그래디언트예요.</p>`;
+  }
+  document.getElementById('px0').oninput=e=>{ px=+e.target.value/100; document.getElementById('px0v').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py0').oninput=e=>{ py=+e.target.value/100; document.getElementById('py0v').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 등고선에 수직 ----------
+(function(){
+  let px=1.5, py=-0.5;
+  function render(){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    const [gx,gy]=CA.gradient(F,px,py); const X=b.X(px),Y=b.Y(py),sc=18;
+    // 등고선 접선 방향 = ∇f에 수직 (−gy, gx)
+    const tlen=34, tx=-gy, ty=gx, tn=Math.hypot(tx,ty)||1;
+    s+=`<line x1="${(X-tx/tn*tlen).toFixed(1)}" y1="${(Y+ty/tn*tlen).toFixed(1)}" x2="${(X+tx/tn*tlen).toFixed(1)}" y2="${(Y-ty/tn*tlen).toFixed(1)}" stroke="rgba(255,255,255,.7)" stroke-width="2"/>`;
+    s+=arrowhead(X,Y, X+gx*sc, Y-gy*sc, 'var(--hot)');
+    s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">∇f = (${VZ.fmt(gx,2)}, ${VZ.fmt(gy,2)})</div><p style="margin:0">주황 ∇f와 회색 등고선 방향이 <b>직각(90°)</b>이에요 — 어느 점에서나.</p>`;
+  }
+  document.getElementById('px1').oninput=e=>{ px=+e.target.value/100; document.getElementById('px1v').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py1').oninput=e=>{ py=+e.target.value/100; document.getElementById('py1v').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 16방향 부채살 ----------
+(function(){
+  let px=-1.2, py=1.4;
+  function render(){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    const [gx,gy]=CA.gradient(F,px,py); const gmag=Math.hypot(gx,gy)||1e-9; const X=b.X(px),Y=b.Y(py);
+    for(let k=0;k<16;k++){ const a=k/16*2*Math.PI, ux=Math.cos(a), uy=Math.sin(a);
+      const D=gx*ux+gy*uy;              // 방향도함수
+      const len=Math.abs(D)/gmag*48;    // ∇f방향에서 최대(=gmag→48)
+      const col=D>=0?'var(--good)':'var(--k)';
+      s+=`<line x1="${X.toFixed(1)}" y1="${Y.toFixed(1)}" x2="${(X+ux*len).toFixed(1)}" y2="${(Y-uy*len).toFixed(1)}" stroke="${col}" stroke-width="2" opacity="0.7"/>`; }
+    s+=arrowhead(X,Y, X+gx/gmag*52, Y-gy/gmag*52, 'var(--hot)');   // ∇f 방향(정규화 길이)
+    s+=`<circle cx="${X.toFixed(1)}" cy="${Y.toFixed(1)}" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('map2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">∇f 방향 기울기 = ${VZ.fmt(gmag,2)} (최대)</div><p style="margin:0">부채살 중 ∇f(주황)와 같은 방향의 초록살이 가장 길어요 = 가장 가파른 오르막. 정반대는 가장 가파른 내리막(−∇f).</p>`;
+  }
+  document.getElementById('px2').oninput=e=>{ px=+e.target.value/100; document.getElementById('px2v').textContent=(px<0?'−':'')+Math.abs(px).toFixed(1); render(); };
+  document.getElementById('py2').oninput=e=>{ py=+e.target.value/100; document.getElementById('py2v').textContent=(py<0?'−':'')+Math.abs(py).toFixed(1); render(); };
+  render();
+})();
+
+// ---------- STEP 3 : −∇f 경사하강 ----------
+(function(){
+  let path=null, cancel=null;
+  const start=[-2.4,2.2];
+  function frame(k){
+    const b=map(); let s=CA.contourGrid(b,F,{nx:44,ny:34,levels:10});
+    if(path){ for(let i=0;i<=k&&i<path.length;i++){ const [x,y]=path[i];
+      s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="${i===Math.min(k,path.length-1)?6:3}" fill="${i===Math.min(k,path.length-1)?'var(--hot)':'rgba(251,191,36,.5)'}" ${i===Math.min(k,path.length-1)?'stroke="#000" stroke-width="1.5"':''}/>`;
+      if(i>0){ const [px,py]=path[i-1]; s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(py).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(y).toFixed(1)}" stroke="rgba(251,191,36,.5)" stroke-width="1.5"/>`; } } }
+    else { s+=`<circle cx="${b.X(start[0]).toFixed(1)}" cy="${b.Y(start[1]).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`; }
+    document.getElementById('map3').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; path=null; frame(0); document.getElementById('info3').innerHTML='<p style="margin:0">▶ 버튼으로 −∇f(가장 가파른 내리막)를 따라 골로 굴러가는 걸 보세요.</p>'; }
+  function roll(){ if(cancel)cancel();
+    path=CA.gradDescent(p=>CA.gradient(F,p[0],p[1]), start, {lr:0.35, steps:40, clip:5});
+    cancel=CA.animatePath(path,(sub,i)=>{ frame(i); const [x,y]=path[Math.min(i,path.length-1)];
+      document.getElementById('info3').innerHTML=`<div class="ttl" style="color:var(--good)">${i+1}걸음 · 위치(${VZ.fmt(x,2)}, ${VZ.fmt(y,2)}) · 높이 ${VZ.fmt(F(x,y),2)}</div><p style="margin:0">${Math.hypot(...CA.gradient(F,x,y))<0.05?'<b>골 도착!</b> ∇f≈0이라 멈춰요.':'−∇f 방향으로 내려가는 중…'}</p>`;
+    }, {interval:140});
+  }
+  document.getElementById('roll').onclick=roll;
+  document.getElementById('reset3').onclick=reset;
+  reset();
+})();
+</script>
+</body>
+</html>
