@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15 미적분 기본정리 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 5 · Chapter 15</div>
+    <h1>미적분 기본정리 — 미분과 적분은 역연산</h1>
+    <p class="intro">미분(기울기 재기)과 적분(넓이 쌓기)은 전혀 달라 보여요. 그런데 둘은 <b>서로의 반대</b>예요. 넓이를 쌓아가는 함수의 <b>기울기를 재면 원래 곡선</b>이 나오죠. 그래서 적분은 "미분을 거꾸로 한 것"이고, 이 덕분에 넓이를 막대 없이 <b>끝점 두 개만으로</b> 구할 수 있어요. 미적분이 하나로 묶이는 순간이에요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 누적넓이 함수</button>
+    <button data-s="1">01 · A의 기울기 = f</button>
+    <button data-s="2">02 · 끝점만으로</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Area-So-Far</span>
+    <h2>"여기까지의 넓이"를 함수로 본다</h2>
+    <p class="lead">곡선 f 아래 <b>0부터 x까지의 넓이</b>를 A(x)라 불러요. x를 오른쪽으로 옮기면 넓이가 점점 쌓이죠. 그 쌓인 값을 아래 그래프에 점으로 찍으면 <b>새 곡선 A(x)</b>가 그려져요. x를 끌어보세요.</p>
+    <div class="ctrl"><label>지점 x</label><input type="range" id="x0" min="20" max="400" value="200"><span class="val" id="x0v">2.00</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 위 = 원래 곡선 f와 채운 넓이, 아래 = 그 넓이를 모은 <b>누적넓이 A(x)</b>. f가 클수록 넓이가 빨리 쌓여 A가 가파르게 올라가요. "A가 자라는 속도"가 곧 f라는 게 다음 단계의 핵심이에요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Slope of A is f</span>
+    <h2>넓이가 자라는 속도 = 그 순간의 높이</h2>
+    <p class="lead">x를 아주 조금(Δx) 더 가면, 늘어난 넓이는 폭 Δx에 높이 f(x)를 곱한 <b>가느다란 띠</b>예요. 그래서 <b>A의 순간 변화율(기울기) = f(x)</b>! 누적넓이 A의 접선 기울기를 재면 정확히 원래 곡선 값이 나와요. 이게 기본정리의 심장이에요.</p>
+    <div class="ctrl"><label>지점 x</label><input type="range" id="x1" min="30" max="390" value="200"><span class="val" id="x1v">2.00</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 아래 A(x) 곡선의 <b>접선 기울기</b>(주황)와 위 f(x) 값(점)이 <b>항상 같아요</b>. 즉 A′(x)=f(x). "넓이 쌓기(적분)"를 미분하면 원래로 돌아오니, 둘은 서로의 역연산이죠.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Just the Endpoints</span>
+    <h2>넓이를 끝점 두 개로 구한다</h2>
+    <p class="lead">A′=f라는 건, 거꾸로 <b>f의 역도함수(미분하면 f가 되는 함수) F를 알면</b> 넓이를 끝점만으로 구할 수 있다는 뜻이에요: 구간 [a, b]의 넓이 = <b>F(b) − F(a)</b>. 막대를 무한히 더할 필요 없이, 양 끝값의 <b>차이</b>면 끝! a·b를 옮겨보세요.</p>
+    <div class="ctrl"><label>왼쪽 a</label><input type="range" id="a2" min="0" max="300" value="80"><span class="val" id="a2v">0.80</span></div>
+    <div class="ctrl"><label>오른쪽 b</label><input type="range" id="b2" min="100" max="400" value="340"><span class="val" id="b2v">3.40</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 채운 넓이(보라)가 정확히 <b>A(b)−A(a)</b>와 같아요. 어렵게 잘게 더하던 넓이를, 역도함수의 <b>두 끝값 차이</b>로 한 번에 — 이게 손으로 적분을 계산하는 방법의 토대예요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>미적분이 하나로 묶이다</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">A′(x) = f(x)</div><p style="margin:0">누적넓이를 미분하면 원래 곡선. 적분과 미분은 서로의 역연산.</p></div>
+      <div class="callout v"><div class="ttl">∫ₐᵇ f = F(b) − F(a)</div><p style="margin:0">역도함수 F의 두 끝값 차이 = 넓이. 막대 합 없이 한 번에.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">이로써 <b>미분(8장까지)</b>과 <b>적분(14장)</b>이 한 줄기로 묶였어요. 변화율을 재는 일과 누적을 구하는 일이 동전의 양면이죠. 마지막 <b>16장</b>에선 다시 최적화로 돌아가, <b>제약이 있는 최적화</b>(예산·규칙 안에서 최선 찾기)를 그래디언트로 봅니다 — 머신러닝의 정규화로 이어져요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="16-constrained.html" style="color:var(--q);font-weight:700">CH 16 · 제약 최적화</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 넓이·기울기는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 15 · 기본정리');
+VZ.setupStepper();
+const CA = VZ.CA;
+const f = x => 0.5 + 0.45*x;             // 원래 곡선(양수, 단조증가)
+const A = x => CA.integrate(f, 0, x, 400); // 누적넓이 함수 = 0.225x²+0.5x
+
+// 위(f)·아래(A) 두 보드를 한 SVG에 쌓는다
+function twoBoards(opts){
+  const W=560, topH=160, botH=190, gap=8;
+  const bf=CA.board2({W,H:topH,xmin:0,xmax:4,ymin:0,ymax:opts.fymax,padT:14,padB:24});
+  const ba=CA.board2({W,H:botH,xmin:0,xmax:4,ymin:0,ymax:opts.aymax,padT:10,padB:26});
+  return {W,topH,botH,gap,bf,ba};
+}
+
+// ---------- STEP 0 : 누적넓이 함수 그리기 ----------
+(function(){
+  let x=2.0;
+  function render(){
+    const {W,topH,botH,gap,bf,ba}=twoBoards({fymax:2.6,aymax:6});
+    // 위: f + 채운 넓이 [0,x]
+    let top=CA.axes(bf,{step:1});
+    const r=CA.riemannRects(bf,f,{a:0,b:Math.max(1e-3,x),n:80,rule:'mid',fill:'var(--q)'});
+    top+=r.svg+CA.fnPlot(bf,f,{color:'var(--hot)'});
+    top+=`<line x1="${bf.X(x).toFixed(1)}" y1="${bf.padT}" x2="${bf.X(x).toFixed(1)}" y2="${(bf.H-bf.padB).toFixed(1)}" stroke="var(--q)" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+    top+=`<text x="${bf.padL+4}" y="${bf.padT+11}" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">f(x) 와 [0,x] 넓이</text>`;
+    // 아래: A(x) 곡선 + 현재 점
+    let bot=CA.axes(ba,{step:1})+CA.fnPlot(ba,A,{color:'var(--v)'});
+    const ax=A(x);
+    bot+=`<circle cx="${ba.X(x).toFixed(1)}" cy="${ba.Y(ax).toFixed(1)}" r="6" fill="var(--v)" stroke="#000" stroke-width="1.4"/>`;
+    bot+=`<line x1="${ba.X(x).toFixed(1)}" y1="${ba.padT}" x2="${ba.X(x).toFixed(1)}" y2="${(ba.H-ba.padB).toFixed(1)}" stroke="var(--v)" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.6"/>`;
+    bot+=`<text x="${ba.padL+4}" y="${ba.padT+11}" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">누적넓이 A(x)</text>`;
+    document.getElementById('chart0').innerHTML=
+      `<svg width="${W}" height="${topH}" viewBox="0 0 ${W} ${topH}" style="max-width:100%;display:block">${top}</svg>`+
+      `<svg width="${W}" height="${botH}" viewBox="0 0 ${W} ${botH}" style="max-width:100%;display:block;margin-top:${gap}px">${bot}</svg>`;
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:var(--q)">x=${VZ.fmt(x,2)} · 채운 넓이 A(x) ≈ ${VZ.fmt(ax,3)}</div>
+      <p style="margin:0">x를 키우면 넓이가 쌓여 아래 점이 위로 올라가요. 지금 곡선 높이 f(x)=${VZ.fmt(f(x),2)}라 넓이가 ${f(x)>1.5?'빠르게':'천천히'} 늘어요.</p>`;
+  }
+  document.getElementById('x0').oninput=e=>{ x=+e.target.value/100; document.getElementById('x0v').textContent=x.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : A의 기울기 = f ----------
+(function(){
+  let x=2.0;
+  function render(){
+    const {W,topH,botH,gap,bf,ba}=twoBoards({fymax:2.6,aymax:6});
+    // 위: f + 현재 높이 점
+    let top=CA.axes(bf,{step:1})+CA.fnPlot(bf,f,{color:'var(--hot)'});
+    top+=`<circle cx="${bf.X(x).toFixed(1)}" cy="${bf.Y(f(x)).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.4"/>`;
+    top+=`<line x1="${bf.padL}" y1="${bf.Y(f(x)).toFixed(1)}" x2="${bf.W-bf.padR}" y2="${bf.Y(f(x)).toFixed(1)}" stroke="var(--hot)" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>`;
+    top+=`<text x="${bf.padL+4}" y="${bf.padT+11}" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">f(x) = 그 순간 높이</text>`;
+    // 아래: A(x) + 접선
+    let bot=CA.axes(ba,{step:1})+CA.fnPlot(ba,A,{color:'var(--v)'});
+    // A의 접선을 x 둘레로 짧게(±0.85) — 보드 안에 머무르게
+    const m=CA.deriv(A,x), ax=A(x), tl=Math.max(0,x-0.85), tr=Math.min(4,x+0.85);
+    bot+=`<line x1="${ba.X(tl).toFixed(1)}" y1="${ba.Y(ax+m*(tl-x)).toFixed(1)}" x2="${ba.X(tr).toFixed(1)}" y2="${ba.Y(ax+m*(tr-x)).toFixed(1)}" stroke="var(--hot)" stroke-width="2.5"/>`;
+    bot+=`<circle cx="${ba.X(x).toFixed(1)}" cy="${ba.Y(ax).toFixed(1)}" r="5" fill="var(--hot)" stroke="#000" stroke-width="1.3"/>`;
+    bot+=`<text x="${ba.padL+4}" y="${ba.padT+11}" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">A(x) 의 접선 기울기</text>`;
+    document.getElementById('chart1').innerHTML=
+      `<svg width="${W}" height="${topH}" viewBox="0 0 ${W} ${topH}" style="max-width:100%;display:block">${top}</svg>`+
+      `<svg width="${W}" height="${botH}" viewBox="0 0 ${W} ${botH}" style="max-width:100%;display:block;margin-top:${gap}px">${bot}</svg>`;
+    const slope=CA.deriv(A,x), fx=f(x);
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--good)">A의 기울기 ${VZ.fmt(slope,3)} = f(x) ${VZ.fmt(fx,3)} ✓</div>
+      <p style="margin:0">아래 누적넓이 곡선의 접선 기울기가 위 곡선의 높이와 똑같죠? 어느 x에서도 <b>A′(x)=f(x)</b>예요 — 적분을 미분하면 제자리로.</p>`;
+  }
+  document.getElementById('x1').oninput=e=>{ x=+e.target.value/100; document.getElementById('x1v').textContent=x.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 끝점만으로 (F(b)-F(a)) ----------
+(function(){
+  let a=0.8, b=3.4;
+  function render(){
+    if(b<a+0.2){ b=a+0.2; document.getElementById('b2').value=Math.round(b*100); document.getElementById('b2v').textContent=b.toFixed(2); }
+    const bd=CA.board2({W:560,H:300,xmin:0,xmax:4,ymin:0,ymax:2.6});
+    let s=CA.axes(bd,{step:1});
+    const r=CA.riemannRects(bd,f,{a,b,n:80,rule:'mid',fill:'var(--v)'});
+    s+=r.svg+CA.fnPlot(bd,f,{color:'var(--hot)'});
+    [a,b].forEach((p,i)=>{ s+=`<line x1="${bd.X(p).toFixed(1)}" y1="${bd.padT}" x2="${bd.X(p).toFixed(1)}" y2="${(bd.H-bd.padB).toFixed(1)}" stroke="var(--v)" stroke-width="1.4" stroke-dasharray="4 3"/><text x="${bd.X(p).toFixed(1)}" y="${(bd.H-bd.padB+16).toFixed(1)}" fill="var(--v)" font-size="12" text-anchor="middle" font-family="JetBrains Mono">${i?'b':'a'}</text>`; });
+    document.getElementById('chart2').innerHTML=`<svg width="${bd.W}" height="${bd.H}" viewBox="0 0 ${bd.W} ${bd.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const Aa=A(a), Ab=A(b), area=Ab-Aa;
+    document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">넓이 = A(b)−A(a) = ${VZ.fmt(Ab,3)} − ${VZ.fmt(Aa,3)} = ${VZ.fmt(area,3)}</div>
+      <p style="margin:0">막대로 더한 채운 넓이(${VZ.fmt(r.sum,3)})와 끝값 차이(${VZ.fmt(area,3)})가 ${Math.abs(r.sum-area)<0.03?'<b style="color:var(--good)">일치해요!</b>':'거의 같아요.'} 넓이를 양 끝값의 뺄셈으로 구한 거예요.</p>`;
+  }
+  document.getElementById('a2').oninput=e=>{ a=+e.target.value/100; document.getElementById('a2v').textContent=a.toFixed(2); render(); };
+  document.getElementById('b2').oninput=e=>{ b=+e.target.value/100; document.getElementById('b2v').textContent=b.toFixed(2); render(); };
+  render();
+})();
+</script>
+</body>
+</html>

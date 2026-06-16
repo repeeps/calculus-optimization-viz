@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14 적분·리만합 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 5 · Chapter 14</div>
+    <h1>적분 — 잘게 쪼갠 넓이를 쌓다</h1>
+    <p class="intro">미분이 "한 점의 기울기"였다면, <b>적분</b>은 곡선 <b>아래의 넓이</b>예요. 구불구불한 넓이를 어떻게 구할까요? <b>가는 직사각형으로 잘게 쪼개</b> 다 더하면 돼요(리만합). 조각을 무한히 잘게 하면 정확한 넓이 — 이게 적분이에요. 넓이는 곧 <b>변화의 누적</b>이고, 통계의 확률로도 이어집니다.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 넓이를 직사각형으로</button>
+    <button data-s="1">01 · 부호 있는 넓이</button>
+    <button data-s="2">02 · 누적 = 적분</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Rectangles</span>
+    <h2>가는 막대로 채울수록 정확해진다</h2>
+    <p class="lead">곡선 아래를 <b>n개의 직사각형</b>으로 채워 그 넓이를 다 더해요. 막대가 적으면 곡선과 어긋나 오차가 크지만, <b>n을 늘릴수록</b> 빈틈이 줄어 <b>참값에 수렴</b>해요. 슬라이더로 막대 수를 바꿔보세요.</p>
+    <div class="ctrl"><label>막대 수 n</label><input type="range" id="n0" min="2" max="80" value="6"><span class="val" id="n0v">6</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 막대 하나의 넓이 = 높이 f(x) × 폭 Δx. 그걸 다 더한 게 <b>리만합</b>이고, 막대를 무한히 가늘게(Δx→0) 한 극한이 <b>적분</b> ∫f dx예요. 미분에서 h→0으로 기울기를 얻었듯, 적분은 Δx→0으로 넓이를 얻죠.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Signed Area</span>
+    <h2>축 아래 넓이는 음수로 센다</h2>
+    <p class="lead">적분은 <b>부호 있는 넓이</b>예요. 곡선이 <b>축 위</b>에 있으면 +, <b>축 아래</b>면 −로 세죠(빨강). 그래서 위·아래가 같으면 <b>서로 상쇄</b>돼 적분이 0이 될 수도 있어요. 구간 끝 b를 옮겨 누적이 어떻게 변하는지 보세요.</p>
+    <div class="ctrl"><label>구간 끝 b</label><input type="range" id="b1" min="50" max="628" value="628"><span class="val" id="b1v">6.28</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 0부터 한 바퀴(2π)까지 sin의 적분은 <b>0</b>이에요 — 앞 절반의 +넓이와 뒤 절반의 −넓이가 정확히 상쇄되니까요. "넓이의 총량"이 아니라 "부호를 살린 합"이 적분이라는 게 핵심이에요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Accumulation</span>
+    <h2>속도 아래 넓이 = 달린 거리</h2>
+    <p class="lead">매 순간의 <b>속도 v(t)</b> 그래프가 있어요. 0부터 시각 T까지 <b>곡선 아래 넓이</b>가 바로 그동안 <b>달린 거리</b>예요. 적분은 이렇게 "<b>변화율을 시간에 따라 누적</b>"하는 연산이에요. T를 끌어 거리가 쌓이는 걸 보세요.</p>
+    <div class="ctrl"><label>시각 T</label><input type="range" id="T2" min="0" max="500" value="250"><span class="val" id="T2v">2.50</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 속도가 빠른 구간일수록 넓이가 빨리 쌓여 거리가 가파르게 늘어요. "변화율(속도)을 모으면 변화량(거리)" — 이 누적이 다음 <b>15장(기본정리)</b>에서 미분과 정확히 맞물립니다.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>적분이 뭐였나</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">잘게 쪼개 더하기</div><p style="margin:0">곡선 아래 넓이 = 가는 직사각형들의 합(리만합)의 극한(Δx→0). 그게 ∫f dx.</p></div>
+      <div class="callout v"><div class="ttl">부호 · 누적</div><p style="margin:0">축 아래는 −. 변화율을 시간에 따라 누적하면 변화량(속도→거리).</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">적분은 통계의 심장이기도 해요: <b>확률밀도함수 아래 넓이 = 확률</b>이거든요. 전체 넓이는 1, 어떤 구간의 넓이가 그 구간에 값이 떨어질 확률이죠. 다음 <b>15장</b>에선 "넓이를 쌓는 적분"과 "기울기를 재는 미분"이 사실 <b>역연산</b>이라는 미적분의 핵심 정리를 봐요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="15-ftc.html" style="color:var(--q);font-weight:700">CH 15 · 미적분 기본정리</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 넓이·리만합은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 14 · 적분·리만합');
+VZ.setupStepper();
+const CA = VZ.CA;
+const inc  = x => 0.3*x*x + 0.3;          // 단조증가 곡선 (Step0): 왼쪽합이 계단처럼 아래로 미달
+const wave = x => Math.sin(x);            // 부호 곡선 (Step1)
+const vel  = t => 1.5 + 1.1*Math.sin(0.9*t) + 0.05*t;  // 속도(양수, 빠름/느림 변동) (Step2)
+
+// ---------- STEP 0 : 리만합 ----------
+(function(){
+  let n=6; const A=0, B=3, TRUE=CA.integrate(inc,A,B,600);
+  function render(){
+    const b=CA.board2({W:560,H:300,xmin:0,xmax:3,ymin:0,ymax:3.4});
+    let s=CA.axes(b,{step:1});
+    const r=CA.riemannRects(b,inc,{a:A,b:B,n,rule:'left',fill:'var(--q)'});
+    s+=r.svg+CA.fnPlot(b,inc,{color:'var(--hot)'});
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const err=Math.abs(r.sum-TRUE), pct=err/TRUE*100;
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:var(--q)">막대 ${n}개 · 합 ≈ ${VZ.fmt(r.sum,3)}</div>
+      <p style="margin:0">참값(아주 가는 막대) ${VZ.fmt(TRUE,3)}와의 오차 ${VZ.fmt(err,3)} (${pct.toFixed(1)}%). ${pct<2.5?'<b style="color:var(--good)">거의 일치 — 빈틈이 사라졌어요!</b>':'막대를 더 늘리면 계단의 빈틈이 줄어요.'}</p>`;
+  }
+  document.getElementById('n0').oninput=e=>{ n=+e.target.value; document.getElementById('n0v').textContent=n; render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 부호 있는 넓이 ----------
+(function(){
+  let B=6.28; const A=0;
+  function render(){
+    const b=CA.board2({W:560,H:300,xmin:0,xmax:6.4,ymin:-1.3,ymax:1.3,padB:24});
+    let s=CA.axes(b,{step:1});
+    const r=CA.riemannRects(b,wave,{a:A,b:B,n:60,rule:'mid',fill:'var(--q)',negFill:'var(--k)'});
+    s+=r.svg+CA.fnPlot(b,wave,{color:'var(--hot)'});
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    const net=CA.integrate(wave,A,B,600);
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:${Math.abs(net)<0.05?'var(--good)':'var(--q)'}">∫₀ᵇ sin = ${VZ.fmt(net,3)} (b=${VZ.fmt(B,2)})</div>
+      <p style="margin:0">${B<Math.PI?'아직 +넓이만 쌓이는 중 — 적분이 커져요.':B<2*Math.PI-0.05?'이제 −넓이(빨강)가 +넓이를 깎아 적분이 줄어요.':'<b style="color:var(--good)">한 바퀴 완성 — +와 −가 상쇄돼 0!</b>'}</p>`;
+  }
+  document.getElementById('b1').oninput=e=>{ B=+e.target.value/100; document.getElementById('b1v').textContent=B.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : 누적(속도→거리) ----------
+(function(){
+  let T=2.5; const A=0, MAXT=5;
+  function render(){
+    const b=CA.board2({W:560,H:300,xmin:0,xmax:5,ymin:0,ymax:3});
+    let s=CA.axes(b,{step:1});
+    const r=CA.riemannRects(b,vel,{a:A,b:Math.max(A+1e-3,T),n:Math.max(2,Math.round(T*16)),rule:'mid',fill:'var(--v)'});
+    s+=r.svg+CA.fnPlot(b,vel,{color:'var(--hot)'});
+    // T 위치 표시선
+    s+=`<line x1="${b.X(T).toFixed(1)}" y1="${b.padT}" x2="${b.X(T).toFixed(1)}" y2="${(b.H-b.padB).toFixed(1)}" stroke="var(--v)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block"><text x="${b.padL+6}" y="${b.padT+12}" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">세로=속도 v(t), 채운 넓이=달린 거리</text>${s}</svg>`;
+    const dist=CA.integrate(vel,A,T,600);
+    document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">T=${VZ.fmt(T,2)}까지 · 달린 거리 ≈ ${VZ.fmt(dist,3)}</div>
+      <p style="margin:0">속도가 ${vel(T)>2?'빠른':'느린'} 구간이라 거리가 ${vel(T)>2?'빠르게':'천천히'} 쌓여요(현재 속도 ${VZ.fmt(vel(T),2)}). 넓이가 곧 누적 거리예요.</p>`;
+  }
+  document.getElementById('T2').oninput=e=>{ T=+e.target.value/100; document.getElementById('T2v').textContent=T.toFixed(2); render(); };
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16 제약 최적화 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .chart-wrap{display:flex; justify-content:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 5 · Chapter 16</div>
+    <h1>제약 최적화 — 규칙 안에서 최선 찾기</h1>
+    <p class="intro">현실의 최적화엔 <b>제약</b>이 있어요. "예산을 넘지 마라", "합이 1이어야 한다" 같은 규칙이죠. 그러면 지형의 진짜 바닥엔 못 가고, <b>허용된 선 위에서만</b> 최선을 찾아야 해요. 놀랍게도 그 답은 <b>등고선이 제약선에 살짝 접하는 순간</b>이고, 거기서 두 그래디언트가 <b>나란해</b>져요. 머신러닝의 정규화가 바로 이 이야기예요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 선 위에서만</button>
+    <button data-s="1">01 · 접하는 순간</button>
+    <button data-s="2">02 · 두 그래디언트가 나란히</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Stuck on the Line</span>
+    <h2>바닥엔 못 가고, 선 위에서만 움직인다</h2>
+    <p class="lead">지형 f의 진짜 최저점(★)은 제약선 <b>바깥</b>에 있어요. 우리는 <b>흰 선 위</b>에만 설 수 있죠. 선을 따라 점을 움직이며 f가 <b>가장 낮아지는 곳</b>을 찾아보세요.</p>
+    <div class="ctrl"><label>선 위 위치</label><input type="range" id="t0" min="0" max="100" value="22"><span class="val" id="t0v">0.22</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 색이 어두울수록(남보라) 낮고, 밝을수록(노랑) 높아요. 선을 따라가면 f가 내려갔다 다시 올라가요. 그 <b>가장 낮은 한 점</b>이 제약 아래의 최적해예요 — 지형의 진짜 바닥과는 다른 곳이죠.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — The Tangent Moment</span>
+    <h2>등고선이 선을 가로지르면, 아직 더 내려갈 수 있다</h2>
+    <p class="lead">점을 지나는 <b>등고선</b>(같은 높이 곡선)을 그려봐요. 등고선이 제약선을 <b>가로지르면</b>, 선을 따라 조금만 가도 더 낮은 등고선으로 넘어갈 수 있어요(=개선 여지). 등고선이 선에 <b>살짝 접하는</b> 순간, 더는 못 내려가요 — 그게 최적!</p>
+    <div class="ctrl"><label>선 위 위치</label><input type="range" id="t1" min="0" max="100" value="22"><span class="val" id="t1v">0.22</span></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ <b>가로지름 = 개선 가능</b>, <b>접함 = 최적</b>. 직관: 등고선과 제약선이 비스듬히 만나면 선을 따라 더 낮은 쪽이 있고, 평행하게 맞닿으면 양옆 어디로 가도 높아지죠.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Gradients Align</span>
+    <h2>접점에선 두 그래디언트가 한 직선 위에</h2>
+    <p class="lead">등고선에 <b>수직</b>인 게 <b>∇f</b>(가장 가파른 오르막), 제약선에 <b>수직</b>인 게 <b>∇g</b>예요. 등고선과 제약선이 접하면 두 수직선도 같은 방향 — 즉 <b>∇f와 ∇g가 나란</b>해져요. 이게 제약 최적화의 핵심 조건(라그랑주)이에요.</p>
+    <div class="ctrl"><label>선 위 위치</label><input type="range" id="t2" min="8" max="92" value="22"><span class="val" id="t2v">0.22</span></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 두 화살표(∇f 주황, ∇g 초록)가 <b>한 직선 위에 놓이는 순간</b>이 최적해예요. 어긋나 있으면, ∇f를 제약선 방향으로 쪼갠 성분이 남아 그쪽으로 더 내려갈 수 있다는 뜻이죠.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>제약 최적화, 그리고 정규화</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">접점이 답</div><p style="margin:0">제약선 위에서 f 최소 = 등고선이 제약선에 접하는 점. 그때 ∇f ∥ ∇g.</p></div>
+      <div class="callout v"><div class="ttl">두 힘의 균형</div><p style="margin:0">"더 내려가려는 힘(∇f)"과 "선을 벗어나지 못하게 막는 힘(∇g)"이 평형.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">머신러닝의 <b>정규화(L2)</b>가 바로 이거예요: 손실을 줄이되 <b>가중치를 원점 가까이(작게) 가두는</b> 제약을 걸죠. 그러면 손실의 진짜 최소가 아니라, <b>"작은 가중치" 제약과 타협한 점</b>에 멈춰 과적합을 줄여요 — 등고선이 제약 영역에 접하는 그 점에서요. 이렇게 <b>미분 → 최적화 → 제약</b>까지, 머신러닝이 학습하는 원리를 눈으로 다 봤어요. 🎉</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="index.html" style="color:var(--q);font-weight:700">전체 목차로</a> · 수고했어요!</p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 등고선·그래디언트는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 16 · 제약 최적화');
+VZ.setupStepper();
+const CA = VZ.CA, LA = VZ.LA;
+const C=[1.3,1.0];                                   // f의 최저점(제약 밖)
+const F=(x,y)=>0.5*((x-C[0])**2+(y-C[1])**2);        // 그릇 지형
+const P0=[-0.5,2.1], P1=[2.1,-0.5];                  // 제약선 x+y=1.6 의 양 끝
+const TOPT=1.45/2.6;                                 // 최적 위치(접점) t≈0.558
+const pt=t=>[P0[0]+(P1[0]-P0[0])*t, P0[1]+(P1[1]-P0[1])*t];
+const DLINE=Math.abs(C[0]+C[1]-1.6)/Math.SQRT2;      // 제약선까지 최단거리 = 최소 반지름
+
+function makeBoard(){ return CA.board2({W:400,H:388,xmin:-0.5,xmax:3,ymin:-0.5,ymax:3,padL:40,padR:16,padT:14,padB:30}); }
+function base(b){ // 히트맵 + 제약선 + ★
+  let s=CA.contourGrid(b,F,{nx:46,ny:46,levels:9});
+  s+=`<line x1="${b.X(P0[0]).toFixed(1)}" y1="${b.Y(P0[1]).toFixed(1)}" x2="${b.X(P1[0]).toFixed(1)}" y2="${b.Y(P1[1]).toFixed(1)}" stroke="#fff" stroke-width="2.5"/>`;
+  s+=`<text x="${b.X(P1[0]).toFixed(1)}" y="${(b.Y(P1[1])-6).toFixed(1)}" fill="#fff" font-size="12" text-anchor="end" font-family="JetBrains Mono">제약 g: x+y=1.6</text>`;
+  s+=`<text x="${b.X(C[0]).toFixed(1)}" y="${(b.Y(C[1])+5).toFixed(1)}" fill="#fff" font-size="16" text-anchor="middle">★</text>`;
+  return s;
+}
+const wrap=(b,s)=>`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+const near=t=>Math.abs(t-TOPT)<0.04;
+
+// ---------- STEP 0 : 선 위에서 f 최소 찾기 ----------
+(function(){
+  let t=0.22;
+  function render(){
+    const b=makeBoard(); let s=base(b); const [x,y]=pt(t);
+    s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="7" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart0').innerHTML=wrap(b,s);
+    const fv=F(x,y), fmin=F(...pt(TOPT));
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:${near(t)?'var(--good)':'var(--q)'}">위치 (${VZ.fmt(x,2)}, ${VZ.fmt(y,2)}) · f = ${VZ.fmt(fv,3)}</div>
+      <p style="margin:0">${near(t)?'<b style="color:var(--good)">여기가 제약 위 최저점!</b> 더 움직이면 다시 높아져요.':(fv-fmin>0.04?'아직 더 낮은 곳이 있어요 — 계속 움직여보세요.':'거의 최저점 근처예요.')}</p>`;
+  }
+  document.getElementById('t0').oninput=e=>{ t=+e.target.value/100; document.getElementById('t0v').textContent=t.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 등고선 접함 ----------
+(function(){
+  let t=0.22;
+  function contourThrough(b,x,y){ // C 중심, 점을 지나는 원
+    const r=Math.hypot(x-C[0],y-C[1]); let d='';
+    for(let i=0;i<=120;i++){ const a=i/120*2*Math.PI, cx=C[0]+r*Math.cos(a), cy=C[1]+r*Math.sin(a);
+      d+=(i?'L':'M')+b.X(cx).toFixed(1)+','+b.Y(cy).toFixed(1)+' '; }
+    return `<path d="${d.trim()}" fill="none" stroke="var(--hot)" stroke-width="2"/>`;
+  }
+  function render(){
+    const b=makeBoard(); let s=base(b); const [x,y]=pt(t);
+    s+=contourThrough(b,x,y);
+    s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="7" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart1').innerHTML=wrap(b,s);
+    const r=Math.hypot(x-C[0],y-C[1]); const tangent=Math.abs(r-DLINE)<0.03;
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:${tangent?'var(--good)':'var(--q)'}">${tangent?'등고선이 제약선에 접해요 → 최적!':'등고선이 제약선을 가로질러요 → 개선 여지 있음'}</div>
+      <p style="margin:0">${tangent?'<b style="color:var(--good)">양옆 어디로 가도 더 높은 등고선뿐</b>이에요.':'선을 따라 등고선이 낮아지는 쪽으로 더 갈 수 있어요.'}</p>`;
+  }
+  document.getElementById('t1').oninput=e=>{ t=+e.target.value/100; document.getElementById('t1v').textContent=t.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 2 : ∇f ∥ ∇g ----------
+(function(){
+  let t=0.22;
+  function arrow(b,x,y,vx,vy,col){ const L=0.62, m=Math.hypot(vx,vy)||1; const ex=x+vx/m*L, ey=y+vy/m*L;
+    return LA.arrowPx(b.X(x),b.Y(y),b.X(ex),b.Y(ey),col,{lw:3}); }
+  function render(){
+    const b=makeBoard(); let s=base(b); const [x,y]=pt(t);
+    const gf=CA.gradient(F,x,y);       // ∇f (오르막)
+    s+=arrow(b,x,y,gf[0],gf[1],'var(--hot)');   // ∇f 주황
+    s+=arrow(b,x,y,1,1,'var(--good)');          // ∇g=(1,1) 초록
+    s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="6" fill="#fff" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart2').innerHTML=wrap(b,s);
+    // 두 벡터 사이 각(직선 기준 0~90°)
+    const m1=Math.hypot(gf[0],gf[1]), cos=Math.abs((gf[0]*1+gf[1]*1)/(m1*Math.SQRT2));
+    const ang=Math.acos(Math.min(1,cos))*180/Math.PI;
+    const aligned=ang<5;
+    document.getElementById('info2').innerHTML=`<div class="ttl" style="color:${aligned?'var(--good)':'var(--v)'}">∇f와 ∇g 사이 각 ≈ ${ang.toFixed(0)}°</div>
+      <p style="margin:0">${aligned?'<b style="color:var(--good)">두 화살표가 한 직선 위 — 평행! 이 점이 제약 최적해예요.</b>':'아직 어긋나 있어요(각≠0). ∇f가 제약선 방향 성분을 가져, 그쪽으로 더 내려갈 수 있어요.'}</p>`;
+  }
+  document.getElementById('t2').oninput=e=>{ t=+e.target.value/100; document.getElementById('t2v').textContent=t.toFixed(2); render(); };
+  render();
+})();
+</script>
+</body>
+</html>
