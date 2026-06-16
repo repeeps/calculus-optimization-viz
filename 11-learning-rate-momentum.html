@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>11 학습률·모멘텀·지역최소 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 4 · Chapter 11</div>
+    <h1>학습률·모멘텀·지역최소 — 왜 학습이 실패하나</h1>
+    <p class="intro">경사하강은 단순하지만, 현실에선 잘 안 풀릴 때가 많아요. <b>학습률</b>을 잘못 고르면 느리거나 발산하고, 지형이 울퉁불퉁하면 <b>지역최소</b>(가짜 골)에 갇히죠. <b>모멘텀</b>(관성)은 이 둘을 동시에 누그러뜨려요. ML 학습이 막히는 흔한 이유와 처방을 봐요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 학습률 고르기</button>
+    <button data-s="1">01 · 지역최소 함정</button>
+    <button data-s="2">02 · 모멘텀(관성)</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Picking the Rate</span>
+    <h2>너무 작으면 굼뜨고, 너무 크면 발산</h2>
+    <p class="lead">같은 그릇에서 학습률 η만 바꿔 <b>골에 닿기까지 걸린 걸음 수</b>를 봐요. 작으면 수십 걸음, 적당하면 몇 걸음, 너무 크면 <b>영영 못 닿고 발산</b>해요. "적당한 η"라는 좁은 창을 찾는 게 핵심이에요.</p>
+    <div class="ctrl"><label>학습률 η</label><input type="range" id="lr0" min="3" max="240" value="30"><span class="val" id="lr0v">0.30</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 손실 곡선(걸음마다 높이)으로 보면 명확해요: 너무 작으면 <b>천천히</b> 내려가고, 적당하면 <b>쭉</b> 떨어지고, 너무 크면 <b>위로 치솟아요</b>. 실무에선 보통 작게 시작해 조금씩 키워 적당한 η를 찾아요.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Local Minima Trap</span>
+    <h2>울퉁불퉁하면 가짜 골에 갇힌다</h2>
+    <p class="lead">봉우리·골이 여러 개인 지형에선, 경사하강은 <b>가까운 골</b>로만 내려가요. <b>시작점이 다르면 다른 골</b>에 갇히죠 — 그게 전역 최소가 아닐 수도 있어요. 여러 공을 동시에 굴려 보세요.</p>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="rollMany">▶ 여러 곳에서 굴리기</button>
+      <button class="btn" id="resetM" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 공마다 <b>가장 가까운 골</b>로 떨어져, 최종 위치가 제각각이에요. 얕은 왼쪽 골(지역최소)에 갇힌 공도, 깊은 오른쪽 골(전역최소)에 닿은 공도 있죠. "경사하강은 항상 최적해를 찾는다"는 <b>틀린</b> 믿음이에요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Momentum</span>
+    <h2>관성을 주면 얕은 골을 빠져나온다</h2>
+    <p class="lead">공에 <b>관성(모멘텀)</b>을 주면, 내려오던 <b>속도가 누적</b>돼요. 그러면 얕은 지역최소를 <b>관성으로 통과</b>하고, 좁은 골에서의 지그재그도 줄어들죠. 같은 시작점에서 <b>기본(파랑)</b> vs <b>모멘텀(주황)</b>을 비교해요.</p>
+    <div class="ctrl"><label>모멘텀 β</label><input type="range" id="beta" min="0" max="92" value="90"><span class="val" id="betav">0.90</span></div>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="rollCmp">▶ 둘 다 굴리기</button>
+      <button class="btn" id="resetC" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 기본 경사하강(파랑)은 얕은 왼쪽 골에 갇혀요. 모멘텀(주황)도 β가 작으면 똑같이 갇히지만, <b>충분히 크면(여기선 0.9쯤부터)</b> 관성으로 <b>그 골을 넘어</b> 더 깊은 오른쪽 골에 닿죠. β를 0.5→0.9로 올리며 경계를 직접 느껴보세요. 실전 옵티마이저(모멘텀·Adam)가 이 아이디어 위에 서요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>학습이 막히는 이유와 처방</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">학습률 η</div><p style="margin:0">작으면 느림, 크면 발산. 적당한 창을 찾아야. 보통 작게 시작.</p></div>
+      <div class="callout v"><div class="ttl">지역최소 · 모멘텀</div><p style="margin:0">울퉁불퉁한 지형은 가짜 골에 갇힘. 관성(모멘텀)이 얕은 골을 넘고 진동을 줄여요.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">실전 딥러닝 옵티마이저(모멘텀, <b>Adam</b> 등)는 이 아이디어를 발전시켜요. 특히 Adam은 <b>좌표(가중치)마다 학습률을 따로</b> 조절해, 가파른 방향은 작게·완만한 방향은 크게 디뎌요(여기선 말로만). 다음 <b>12장 볼록성</b>에선 "애초에 지역최소 걱정이 없는 착한 지형"이 뭔지 봐요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="12-convexity.html" style="color:var(--q);font-weight:700">CH 12 · 볼록성</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 경로·손실은 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 11 · 학습률·모멘텀');
+VZ.setupStepper();
+const CA = VZ.CA;
+const bowl = x => 0.5*x*x + 0.4;                       // 1D 그릇 (Step0): x←x(1−η), η>2면 발산
+const wig  = x => 0.15*x*x*x*x - 0.8*x*x - 0.12*x + 1.6;  // 이중 골(왼쪽 얕음·오른쪽 깊음): 왼쪽 지역최소 x≈−1.6(0.73), 오른쪽 전역최소 x≈1.67(0.34)
+
+// ---------- STEP 0 : 학습률 → 걸음 수 ----------
+(function(){
+  let lr=0.30;
+  function render(){
+    // 손실 곡선(걸음마다 높이)
+    const path=CA.gradDescent(p=>[CA.deriv(bowl,p[0])],[2.6],{lr,steps:40,clip:20,tol:1e-3});
+    const losses=path.map((p,i)=>[i, bowl(p[0])]);
+    const diverged=Math.abs(path[path.length-1][0])>3;
+    const steps=path.length-1;
+    const b=CA.board2({W:560,H:240,xmin:0,xmax:40,ymin:0,ymax:Math.min(12,Math.max(...losses.map(l=>l[1]),2)*1.1)});
+    let s=CA.axes(b,{step:5})+CA.fnPlot(b,()=>NaN,{});  // axes only
+    // 손실 점선
+    const pts=losses.filter(l=>isFinite(l[1])&&l[1]<=b.ymax);
+    let d=pts.map((p,i)=>(i?'L':'M')+b.X(p[0]).toFixed(1)+','+b.Y(Math.min(p[1],b.ymax)).toFixed(1)).join(' ');
+    s+=`<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5"/>`;
+    pts.forEach(p=>{ s+=`<circle cx="${b.X(p[0]).toFixed(1)}" cy="${b.Y(Math.min(p[1],b.ymax)).toFixed(1)}" r="2.5" fill="var(--hot)"/>`; });
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block"><text x="14" y="12" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">세로=손실, 가로=걸음 수</text>${s}</svg>`;
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:var(--q)">η=${VZ.fmt(lr,2)} · ${diverged?'<b style="color:var(--k)">발산</b>':steps+'걸음 만에 골 도착'}</div>
+       <p style="margin:0">${lr<0.2?'너무 작아 굼떠요(많은 걸음 필요).':lr>2?'<b style="color:var(--k)">η≥2 — 손실이 치솟으며 발산!</b>':'적당해요 — 손실이 쭉 떨어져요.'}</p>`;
+  }
+  document.getElementById('lr0').oninput=e=>{ lr=+e.target.value/100; document.getElementById('lr0v').textContent=lr.toFixed(2); render(); };
+  render();
+})();
+
+// ---------- STEP 1 : 지역최소(여러 시작점) ----------
+(function(){
+  const starts=[-2.5,-1.2,0.3,1.4,2.6]; let paths=null, cancel=null;
+  function frame(k){
+    const b=CA.board2({W:560,H:280,xmin:-3,xmax:3,ymin:0,ymax:3.2});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,wig,{color:'var(--q)'});
+    const cols=['#fbbf24','#34d399','#f472b6','#60a5fa','#c084fc'];
+    if(paths){ paths.forEach((path,pi)=>{ const idx=Math.min(k,path.length-1); const x=path[idx][0];
+      s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(wig(x)).toFixed(1)}" r="5.5" fill="${cols[pi]}" stroke="#000" stroke-width="1.2"/>`; }); }
+    else starts.forEach((x,pi)=>{ s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(wig(x)).toFixed(1)}" r="5.5" fill="${cols[pi]}" stroke="#000" stroke-width="1.2"/>`; });
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; paths=null; frame(0); document.getElementById('info1').innerHTML='<p style="margin:0">▶로 5개 공을 동시에 굴려, 시작점마다 다른 골에 갇히는 걸 보세요.</p>'; }
+  function roll(){ if(cancel)cancel();
+    paths=starts.map(x0=>CA.gradDescent(p=>[CA.deriv(wig,p[0])],[x0],{lr:0.12,steps:60,clip:3}));
+    const maxLen=Math.max(...paths.map(p=>p.length));
+    cancel=CA.animatePath(Array.from({length:maxLen},(_,i)=>[i]),(sub,i)=>{ frame(i);
+      if(i>=maxLen-1){ const finals=paths.map(p=>p[p.length-1][0]); const wells=new Set(finals.map(x=>x<0?'L':'R'));
+        document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">최종 위치 제각각</div><p style="margin:0">5개 공이 ${wells.size>1?'<b>서로 다른 골</b>에 갇혔어요':'같은 골에 모였어요'}. 왼쪽 골은 얕은 <b>지역최소</b>, 오른쪽이 더 깊은 <b>전역최소</b>예요.</p>`; }
+    },{interval:90});
+  }
+  document.getElementById('rollMany').onclick=roll;
+  document.getElementById('resetM').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 2 : 모멘텀 비교 ----------
+(function(){
+  let beta=0.90, cancel=null, pV=null, pM=null; const x0=-2.5;
+  function descend(useMom){ let x=x0,v=0,lr=0.06,path=[[x]]; for(let i=0;i<160;i++){ const g=CA.deriv(wig,x);
+    if(useMom){ v=beta*v - lr*g; } else { v=-lr*g; } x=x+v; if(!isFinite(x)||Math.abs(x)>3.2)break; path.push([x]); if(Math.abs(g)<0.01&&Math.abs(v)<0.005)break; } return path; }
+  function frame(k){
+    const b=CA.board2({W:560,H:280,xmin:-3,xmax:3,ymin:0,ymax:3.2});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,wig,{color:'var(--muted)'});
+    const draw=(path,col)=>{ if(!path)return; const idx=Math.min(k,path.length-1); const x=path[idx][0];
+      s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(wig(x)).toFixed(1)}" r="6" fill="${col}" stroke="#000" stroke-width="1.3"/>`; };
+    draw(pV,'var(--q)'); draw(pM,'var(--hot)');
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; pV=null; pM=null; frame(0); document.getElementById('info2').innerHTML='<p style="margin:0">▶로 기본(파랑)과 모멘텀(주황)을 같이 굴려 비교하세요.</p>'; }
+  function roll(){ if(cancel)cancel(); pV=descend(false); pM=descend(true); const maxLen=Math.max(pV.length,pM.length);
+    cancel=CA.animatePath(Array.from({length:maxLen},(_,i)=>[i]),(sub,i)=>{ frame(i);
+      if(i>=maxLen-1){ const xv=pV[pV.length-1][0], xm=pM[pM.length-1][0];
+        document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">기본 → ${xv<0?'왼쪽 얕은 골':'오른쪽 깊은 골'} · 모멘텀 → ${xm<0?'왼쪽 얕은 골':'오른쪽 깊은 골'}</div><p style="margin:0">${xm>0&&xv<0?'<b style="color:var(--good)">모멘텀이 얕은 골을 관성으로 넘어 더 깊은 골에 닿았어요!</b>':xm<0?'<b>아직 못 넘었어요.</b> β를 0.9 이상으로 올려 다시 굴려보세요 — 관성이 충분해야 얕은 골을 넘어요.':'둘 다 같은 골에 모였어요.'}</p>`; }
+    },{interval:70});
+  }
+  document.getElementById('beta').oninput=e=>{ beta=+e.target.value/100; document.getElementById('betav').textContent=beta.toFixed(2); reset(); };
+  document.getElementById('rollCmp').onclick=roll;
+  document.getElementById('resetC').onclick=reset;
+  reset();
+})();
+</script>
+</body>
+</html>

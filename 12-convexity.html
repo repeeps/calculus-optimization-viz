@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12 볼록성 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 4 · Chapter 12</div>
+    <h1>볼록성 — 골짜기가 하나뿐인 착한 지형</h1>
+    <p class="intro"><b>볼록 함수</b>는 그릇처럼 골짜기가 <b>딱 하나</b>예요. 그래서 어디서 시작해 경사하강을 해도 <b>같은 최소</b>에 닿고, 지역최소에 갇힐 걱정이 없죠. "이 문제가 볼록인가?"는 최적화가 쉬운지 어려운지를 가르는 핵심 질문이에요. 선형회귀가 잘 풀리는 이유이기도 하고요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 현이 곡선 위</button>
+    <button data-s="1">01 · 골이 하나뿐</button>
+    <button data-s="2">02 · 왜 중요한가</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Chord Above Curve</span>
+    <h2>두 점을 이은 줄이 곡선 위에 있으면 볼록</h2>
+    <p class="lead">곡선 위 두 점을 직선(<b>현</b>)으로 이어요. 그 현이 <b>항상 곡선보다 위(또는 같음)</b>면 <b>볼록</b>이에요. 비볼록 곡선에선 현이 곡선 <b>아래로 파고드는</b> 구간이 생기죠. 두 점을 움직여 확인하세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="cConv">볼록 (그릇)</button>
+      <button class="btn" id="cNon" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">비볼록 (이중 골)</button>
+    </div>
+    <div class="ctrl"><label>왼쪽 점 a</label><input type="range" id="pa" min="-260" max="0" value="-200"><span class="val" id="pav">−2.0</span></div>
+    <div class="ctrl"><label>오른쪽 점 b</label><input type="range" id="pb" min="0" max="260" value="200"><span class="val" id="pbv">2.0</span></div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 볼록(그릇)에선 두 점을 어떻게 잡아도 현이 곡선 위에 있어요. 비볼록은 두 골을 가로지르면 현이 가운데 봉우리 아래로 들어가죠 — 그 순간 "비볼록"임이 드러나요. (이건 5장 f″≥0과 같은 이야기예요.)</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — One Valley</span>
+    <h2>볼록이면 어디서 시작해도 같은 골</h2>
+    <p class="lead">볼록 곡선엔 골이 <b>하나</b>뿐이라, 여러 곳에서 공을 굴려도 <b>모두 같은 최소</b>에 모여요. 비볼록은 11장에서 봤듯 시작점마다 다른 골에 갇히죠. 토글해 비교하세요.</p>
+    <div class="row" style="gap:8px;margin-bottom:6px">
+      <button class="btn" id="sConv">볼록</button>
+      <button class="btn" id="sNon" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">비볼록</button>
+    </div>
+    <div class="row" style="gap:8px;margin:6px 0"><button class="btn" id="rollAll">▶ 여러 곳에서 굴리기</button><button class="btn" id="resetS" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button></div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 볼록: 5개 공이 <b>한 점</b>으로 모여요(전역최소 보장). 비볼록: 서로 다른 골로 갈라져 갇혀요. 그래서 볼록 문제는 "시작점·초기화 걱정 없이" 풀려요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — Why It Matters</span>
+    <h2>볼록이면 "지역최소 = 전역최소"</h2>
+    <p class="lead">볼록 함수에선 <b>f′=0인 곳이 곧 전역최소</b>예요(골이 하나니까). 그래서 경사하강이 멈추면 그게 최선이라 믿을 수 있죠. 비볼록(신경망 등)은 그 보장이 없어, 멈춘 곳이 전역최소인지 알 수 없어요.</p>
+    <div class="twocol" style="margin-top:8px">
+      <div class="colbox"><div class="ttl" style="color:var(--good)">볼록 = 착한 문제</div><p class="legend" style="margin:0">선형회귀(MSE), 로지스틱 회귀, 최소제곱(선대 12장), SVM… 손실이 볼록 → <b>전역해 보장</b>. 어디서 시작해도 OK.</p></div>
+      <div class="colbox"><div class="ttl" style="color:var(--k)">비볼록 = 어려운 문제</div><p class="legend" style="margin:0">신경망 손실은 봉우리·골·안장이 가득. 전역최소 보장 없음 → 초기화·학습률·모멘텀이 중요해져요.</p></div>
+    </div>
+    <div id="info2" class="callout v" style="margin-top:12px"></div>
+    <p class="note" style="margin-top:12px">→ 그래서 "내 문제가 볼록인가?"를 먼저 물어요. 볼록이면 마음 놓고 경사하강. 비볼록이면 좋은 해에 닿도록 온갖 기법(모멘텀·적응 학습률·좋은 초기화)을 동원하죠.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>볼록성이 주는 것</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">볼록 = 현이 곡선 위</div><p style="margin:0">= 골이 하나 = f″≥0(아래로 볼록). 그릇 모양.</p></div>
+      <div class="callout v"><div class="ttl">전역최소 보장</div><p style="margin:0">볼록이면 지역최소=전역최소. 어디서 시작해도 같은 최선에 도달.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">볼록성은 "이 최적화가 믿을 만한가"의 보증서예요. 고전 머신러닝(회귀·SVM)이 안정적인 비결이죠. 다음 <b>13장 뉴턴법</b>에선 곡률(f″, 2장·5장)을 적극 써서 <b>한 번에 골로 점프</b>하는 더 빠른 방법을 봐요(특히 볼록 문제에서 강력).</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="13-newton.html" style="color:var(--q);font-weight:700">CH 13 · 뉴턴법</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 곡선·현·경로는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 12 · 볼록성');
+VZ.setupStepper();
+const CA = VZ.CA;
+const conv = x => 0.4*x*x + 0.3;                          // 볼록
+const non  = x => 0.15*x*x*x*x - 0.8*x*x + 0.12*x + 1.6;  // 비볼록(이중 골)
+
+// ---------- STEP 0 : 현 ----------
+(function(){
+  let kind='conv', a=-2.0, b=2.0;
+  function render(){
+    const f = kind==='conv'?conv:non;
+    const vp = kind==='conv'?{xmin:-3,xmax:3,ymax:4}:{xmin:-2.7,xmax:2.7,ymax:4.2};
+    const bd=CA.board2({W:560,H:280,ymin:0,...vp});
+    let s=CA.axes(bd,{step:1})+CA.fnPlot(bd,f,{color:'var(--q)'});
+    // 현
+    const ya=f(a), yb=f(b);
+    s+=`<line x1="${bd.X(a).toFixed(1)}" y1="${bd.Y(ya).toFixed(1)}" x2="${bd.X(b).toFixed(1)}" y2="${bd.Y(yb).toFixed(1)}" stroke="var(--hot)" stroke-width="2.5"/>`;
+    s+=`<circle cx="${bd.X(a).toFixed(1)}" cy="${bd.Y(ya).toFixed(1)}" r="4.5" fill="var(--hot)"/><circle cx="${bd.X(b).toFixed(1)}" cy="${bd.Y(yb).toFixed(1)}" r="4.5" fill="var(--hot)"/>`;
+    // 현이 곡선 아래로 파고드는지 검사(샘플)
+    let below=false, worstX=null, worstGap=0;
+    for(let t=0.02;t<1;t+=0.02){ const x=a+(b-a)*t, chord=ya+(yb-ya)*t, gap=f(x)-chord;
+      if(gap>worstGap){ worstGap=gap; worstX=x; } if(gap>0.02) below=true; }
+    if(below && worstX!=null){ s+=`<circle cx="${bd.X(worstX).toFixed(1)}" cy="${bd.Y(f(worstX)).toFixed(1)}" r="5" fill="none" stroke="var(--k)" stroke-width="2"/><line x1="${bd.X(worstX).toFixed(1)}" y1="${bd.Y(f(worstX)).toFixed(1)}" x2="${bd.X(worstX).toFixed(1)}" y2="${bd.Y(ya+(yb-ya)*((worstX-a)/(b-a))).toFixed(1)}" stroke="var(--k)" stroke-width="1.5" stroke-dasharray="3 2"/>`; }
+    document.getElementById('chart0').innerHTML=`<svg width="${bd.W}" height="${bd.H}" viewBox="0 0 ${bd.W} ${bd.H}" style="max-width:100%;display:block">${s}</svg>`;
+    document.getElementById('info0').innerHTML=
+      `<div class="ttl" style="color:${below?'var(--k)':'var(--good)'}">${below?'현이 곡선 아래로 파고들어요 → 이 구간은 비볼록!':'현이 곡선 위에 있어요 → 볼록 ✓'}</div>
+       <p style="margin:0">${kind==='conv'?'그릇 곡선은 두 점을 어떻게 잡아도 현이 항상 위예요.':'두 골을 가로지르면(a·b를 양쪽 끝으로) 현이 가운데 봉우리 아래로 들어가요(빨강).'}</p>`;
+  }
+  function setK(k){ kind=k; [['cConv','conv'],['cNon','non']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); render(); }
+  document.getElementById('cConv').onclick=()=>setK('conv');
+  document.getElementById('cNon').onclick=()=>setK('non');
+  document.getElementById('pa').oninput=e=>{ a=+e.target.value/100; document.getElementById('pav').textContent=(a<0?'−':'')+Math.abs(a).toFixed(1); render(); };
+  document.getElementById('pb').oninput=e=>{ b=+e.target.value/100; document.getElementById('pbv').textContent=b.toFixed(1); render(); };
+  setK('conv');
+})();
+
+// ---------- STEP 1 : 골 하나 vs 여러개 ----------
+(function(){
+  let kind='conv', paths=null, cancel=null; const starts=[-2.6,-1.3,0.2,1.3,2.6];
+  const cols=['#fbbf24','#34d399','#f472b6','#60a5fa','#c084fc'];
+  function frame(k){
+    const f=kind==='conv'?conv:non;
+    const vp = kind==='conv'?{xmin:-3,xmax:3,ymax:4}:{xmin:-2.7,xmax:2.7,ymax:4.2};
+    const b=CA.board2({W:560,H:280,ymin:0,...vp});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,f,{color:'var(--q)'});
+    const P = paths || starts.map(x=>[[x]]);
+    P.forEach((path,pi)=>{ const x=path[Math.min(k,path.length-1)][0]; s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(f(x)).toFixed(1)}" r="5.5" fill="${cols[pi]}" stroke="#000" stroke-width="1.2"/>`; });
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; paths=null; frame(0); document.getElementById('info1').innerHTML=`<p style="margin:0">▶로 5개 공을 굴려보세요. ${kind==='conv'?'볼록이라 한 점으로 모일 거예요.':'비볼록이라 흩어질 거예요.'}</p>`; }
+  function roll(){ if(cancel)cancel(); const f=kind==='conv'?conv:non;
+    paths=starts.map(x0=>CA.gradDescent(p=>[CA.deriv(f,p[0])],[x0],{lr:0.12,steps:70,clip:3}));
+    const maxLen=Math.max(...paths.map(p=>p.length));
+    cancel=CA.animatePath(Array.from({length:maxLen},(_,i)=>[i]),(sub,i)=>{ frame(i);
+      if(i>=maxLen-1){ const finals=paths.map(p=>p[p.length-1][0]); const spread=Math.max(...finals)-Math.min(...finals);
+        document.getElementById('info1').innerHTML=`<div class="ttl" style="color:${spread<0.3?'var(--good)':'var(--k)'}">${spread<0.3?'한 점으로 모임 — 전역최소 ✓':'서로 다른 골에 갇힘'}</div><p style="margin:0">${kind==='conv'?'볼록이라 어느 시작점이든 같은 골. 초기화 걱정 없죠.':'비볼록이라 시작점마다 다른 골. 어디가 전역최소인지 알기 어려워요.'}</p>`; }
+    },{interval:80});
+  }
+  function setK(k){ kind=k; [['sConv','conv'],['sNon','non']].forEach(([id,kk])=>{ document.getElementById(id).style.cssText = kk===k?'':'border-color:var(--line);background:var(--panel-2);color:var(--muted)'; }); reset(); }
+  document.getElementById('sConv').onclick=()=>setK('conv');
+  document.getElementById('sNon').onclick=()=>setK('non');
+  document.getElementById('rollAll').onclick=roll;
+  document.getElementById('resetS').onclick=reset;
+  setK('conv');
+})();
+
+// ---------- STEP 2 : 정적 비교 메시지 ----------
+document.getElementById('info2').innerHTML='<div class="ttl" style="color:var(--v)">핵심</div><p style="margin:0">볼록이면 경사하강이 멈춘 곳 = 전역최소(믿어도 됨). 비볼록이면 멈춘 곳이 최선인지 보장이 없어, 여러 번·여러 초기화로 시도해요.</p>';
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>13 뉴턴법 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 4 · Chapter 13</div>
+    <h1>뉴턴법 — 곡률까지 쓰면 한 방에 골로</h1>
+    <p class="intro">경사하강은 <b>기울기(1차 정보)</b>만 써서 보폭을 감으로 정해요. <b>뉴턴법</b>은 <b>곡률(2차 정보 f″)</b>까지 써서, 그 점에서 곡선을 <b>포물선으로 근사</b>하고 그 포물선의 <b>바닥으로 곧장 점프</b>해요. 그래서 훨씬 적은 걸음으로 골에 닿죠. 단, 곡률이 잘못된 곳에선 엉뚱한 데로 튈 수 있어요.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 포물선으로 점프</button>
+    <button data-s="1">01 · 경사하강 vs 뉴턴</button>
+    <button data-s="2">02 · 함정</button>
+    <button data-s="3">03 · 정리</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — Jump to the Vertex</span>
+    <h2>그 점에서 곡선을 포물선으로 흉내내고, 바닥으로</h2>
+    <p class="lead">현재 점에서 곡선의 <b>기울기와 곡률</b>이 똑같은 <b>포물선</b>(주황)을 그려요(2차 근사). 그 포물선의 <b>꼭짓점(바닥)</b>으로 곧장 옮기는 게 뉴턴 한 걸음이에요: <b>x ← x − f′/f″</b>. ▶로 한 걸음씩.</p>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="step0">▶ 뉴턴 한 걸음</button>
+      <button class="btn" id="reset0" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 곡률 f″이 "얼마나 휘었나"를 알려주니, 보폭을 <b>감이 아니라 곡률로</b> 정해요. 곡선이 진짜 포물선(2차함수)이면 <b>단 한 걸음</b>에 정확히 바닥에 닿아요. 일반 곡선도 몇 걸음이면 충분하죠.</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — GD vs Newton</span>
+    <h2>같은 출발, 누가 빨리 닿나</h2>
+    <p class="lead">같은 시작점에서 <b>경사하강(파랑, 작은 걸음 여러 번)</b>과 <b>뉴턴법(주황, 큰 점프 몇 번)</b>을 비교해요. 뉴턴이 훨씬 <b>적은 걸음</b>으로 골에 닿죠. ▶로 굴려보세요.</p>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="roll1">▶ 둘 다 굴리기</button>
+      <button class="btn" id="reset1" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 뉴턴은 곡률 정보 덕에 보폭을 똑똑하게 정해 <b>단 몇 걸음</b>(여기선 6걸음)이면 끝, 경사하강은 <b>수십 걸음</b>(여기선 40걸음대)이 걸려요. 다만 뉴턴은 매 걸음 f″(다변수에선 거대한 행렬)을 계산해야 해서 차원이 크면 비싸요.</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — The Trap</span>
+    <h2>곡률이 위로 휜 곳(오목)에선 엉뚱한 데로</h2>
+    <p class="lead">뉴턴법은 포물선의 <b>꼭짓점</b>으로 가요. 그런데 <b>오목한 구간(f″<0, 봉우리 쪽)</b>에서는 그 포물선이 <b>위로 볼록</b>이라, 꼭짓점이 <b>최댓값(봉우리)</b>! 그래서 뉴턴이 <b>골이 아니라 봉우리로</b> 점프하거나 발산해요. 시작점을 옮겨 보세요.</p>
+    <div class="ctrl"><label>시작 x</label><input type="range" id="sx" min="-250" max="250" value="-30"><span class="val" id="sxv">−0.3</span></div>
+    <div class="row" style="gap:8px;margin:6px 0"><button class="btn" id="roll2">▶ 뉴턴 굴리기</button><button class="btn" id="reset2" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button></div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 봉우리 근처(f″<0)에서 시작하면 뉴턴이 <b>봉우리로</b> 끌려가요(최소가 아니라 최대로!). 그래서 실전에선 곡률이 양수일 때만 쓰거나(볼록 문제), 안전장치를 더한 변형을 써요. <b>볼록 지형에서 뉴턴이 가장 빛나요</b>(12장).</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — Recap</span>
+    <h2>뉴턴법의 빛과 그늘</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">곡률로 점프</div><p style="margin:0">x ← x − f′/f″. 2차 근사 포물선의 바닥으로. 적은 걸음에 수렴(2차함수는 한 방).</p></div>
+      <div class="callout k" style="background:rgba(251,113,133,.06);border-color:rgba(251,113,133,.25)"><div class="ttl" style="color:var(--k)">단점·함정</div><p style="margin:0">매 걸음 f″ 계산(다변수면 거대 행렬→비쌈). 오목 구간에선 봉우리로 튐.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">정리: <b>경사하강</b>은 싸고 튼튼하지만 느리고, <b>뉴턴법</b>은 빠르지만 비싸고 까다로워요. 그래서 대규모 딥러닝은 경사하강(+모멘텀·Adam)을, 작고 볼록한 문제는 뉴턴류를 써요. 이로써 <b>미분→최적화</b> 줄기가 끝났어요. 다음 <b>14장</b>부터는 반대 연산 <b>적분</b>으로 — 넓이를 쌓아 통계로 이어집니다.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="14-integral.html" style="color:var(--q);font-weight:700">CH 14 · 적분·리만합</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 포물선·점프는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 13 · 뉴턴법');
+VZ.setupStepper();
+const CA = VZ.CA;
+const d2 = (f,x,h=1e-3) => (f(x+h)-2*f(x)+f(x-h))/(h*h);
+const fc = x => 0.12*x*x*x*x + 0.35*x*x + 0.4;            // 볼록(Step0/1)
+const fn = x => 0.15*x*x*x*x - 0.8*x*x + 0.12*x + 1.6;    // 비볼록(Step2): 가운데 봉우리(오목)
+// ymax 위로 솟는 부분은 그리지 않아(NaN) 차트 밖으로 튀어나가지 않게
+const clip = (f,ymax) => t => { const v=f(t); return (v>=0 && v<=ymax) ? v : NaN; };
+
+// ---------- STEP 0 : 2차 근사 포물선 점프 ----------
+(function(){
+  const x0init=2.4; let x=x0init, n=0;
+  function draw(){
+    const b=CA.board2({W:560,H:300,xmin:-3,xmax:3,ymin:0,ymax:8});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,clip(fc,8),{color:'var(--q)'});
+    const g=CA.deriv(fc,x), h=d2(fc,x);
+    const q = t => fc(x)+g*(t-x)+0.5*h*(t-x)*(t-x);   // 2차 근사
+    s+=CA.fnPlot(b,clip(q,8),{color:'var(--hot)',dash:'5 4',sw:2});
+    const vert = x - g/h;
+    s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(fc(x)).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    s+=`<circle cx="${b.X(vert).toFixed(1)}" cy="${b.Y(fc(vert)).toFixed(1)}" r="5" fill="none" stroke="var(--good)" stroke-width="2"/>`;
+    s+=`<line x1="${b.X(x).toFixed(1)}" y1="${b.Y(fc(x)).toFixed(1)}" x2="${b.X(vert).toFixed(1)}" y2="${b.Y(fc(x)).toFixed(1)}" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="2 2"/>`;
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+    return {g,h,vert};
+  }
+  function info(){ const {g,h,vert}=draw();
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:var(--q)">${n}걸음 · x=${VZ.fmt(x,3)} · f′=${VZ.fmt(g,2)} · f″=${VZ.fmt(h,2)}</div>
+      <p style="margin:0">초록 원 = 주황 포물선의 바닥(다음 위치) = x − f′/f″ = ${VZ.fmt(vert,3)}. ${Math.abs(g)<0.02?'<b style="color:var(--good)">도착!</b>':'▶로 그리 점프해요.'}</p>`; }
+  function stepOnce(){ const g=CA.deriv(fc,x), h=d2(fc,x); x=x-g/h; n++; info(); }
+  function reset(){ x=x0init; n=0; info(); }
+  document.getElementById('step0').onclick=stepOnce;
+  document.getElementById('reset0').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 1 : GD vs Newton ----------
+(function(){
+  const x0=2.4; let pGD=null, pN=null, cancel=null;
+  function gd(){ let x=x0,path=[[x]]; for(let i=0;i<60;i++){ const g=CA.deriv(fc,x); x=x-0.12*g; path.push([x]); if(Math.abs(g)<0.02)break; } return path; }
+  function newton(){ let x=x0,path=[[x]]; for(let i=0;i<12;i++){ const g=CA.deriv(fc,x); x=x-g/d2(fc,x); path.push([x]); if(Math.abs(g)<0.02)break; } return path; }
+  function frame(k){
+    const b=CA.board2({W:560,H:300,xmin:-3,xmax:3,ymin:0,ymax:8});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,clip(fc,8),{color:'var(--muted)'});
+    const drawP=(path,col)=>{ if(!path)return; const idx=Math.min(k,path.length-1);
+      for(let i=1;i<=idx;i++){ const px=path[i-1][0],x=path[i][0]; s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(fc(px)).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(fc(x)).toFixed(1)}" stroke="${col}" stroke-width="1.5" opacity="0.6"/>`; }
+      const x=path[idx][0]; s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(fc(x)).toFixed(1)}" r="6" fill="${col}" stroke="#000" stroke-width="1.3"/>`; };
+    drawP(pGD,'var(--q)'); drawP(pN,'var(--hot)');
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; pGD=null; pN=null; frame(0); document.getElementById('info1').innerHTML='<p style="margin:0">▶로 경사하강(파랑)과 뉴턴(주황)을 비교하세요.</p>'; }
+  function roll(){ if(cancel)cancel(); pGD=gd(); pN=newton(); const maxLen=Math.max(pGD.length,pN.length);
+    cancel=CA.animatePath(Array.from({length:maxLen},(_,i)=>[i]),(sub,i)=>{ frame(i);
+      if(i>=maxLen-1) document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">경사하강 ${pGD.length-1}걸음 vs 뉴턴 <b style="color:var(--hot)">${pN.length-1}걸음</b></div><p style="margin:0">뉴턴법이 곡률 덕에 훨씬 적은 걸음으로 같은 골에 닿았어요.</p>`;
+    },{interval:260});
+  }
+  document.getElementById('roll1').onclick=roll;
+  document.getElementById('reset1').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 2 : 함정 ----------
+(function(){
+  let sx=-0.3, path=null, cancel=null;
+  function frame(k){
+    const b=CA.board2({W:560,H:300,xmin:-3,xmax:3,ymin:0,ymax:3.2});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,clip(fn,3.2),{color:'var(--q)'});
+    if(path){ const idx=Math.min(k,path.length-1);
+      for(let i=1;i<=idx;i++){ const px=path[i-1],x=path[i]; if(Math.abs(x)>3)continue;
+        s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(fn(px)).toFixed(1)}" x2="${b.X(Math.max(-3,Math.min(3,x))).toFixed(1)}" y2="${b.Y(fn(Math.max(-3,Math.min(3,x)))).toFixed(1)}" stroke="var(--hot)" stroke-width="1.5" opacity="0.6"/>`; }
+      const xc=Math.max(-3,Math.min(3,path[idx])), yc=Math.min(fn(xc),3.12); s+=`<circle cx="${b.X(xc).toFixed(1)}" cy="${b.Y(yc).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.3"/>`; }
+    else s+=`<circle cx="${b.X(sx).toFixed(1)}" cy="${b.Y(fn(sx)).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.3"/>`;
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; path=null; frame(0);
+    const h=d2(fn,sx); document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">시작 x=${VZ.fmt(sx,2)} · f″=${VZ.fmt(h,2)} ${h<0?'(오목!)':'(볼록)'}</div><p style="margin:0">${h<0?'여기는 봉우리 쪽(f″<0). 뉴턴이 봉우리로 끌려갈 거예요.':'여기는 골 쪽(f″>0). 정상적으로 골로 갈 거예요.'} ▶로 확인.</p>`; }
+  function roll(){ if(cancel)cancel(); let x=sx, p=[x]; for(let i=0;i<10;i++){ const h=d2(fn,x); if(Math.abs(h)<1e-3)break; x=x-CA.deriv(fn,x)/h; p.push(x); if(!isFinite(x)||Math.abs(x)>3)break; if(Math.abs(CA.deriv(fn,x))<0.02)break; } path=p;
+    cancel=CA.animatePath(p.map(v=>[v]),(sub,i)=>{ frame(i);
+      if(i>=p.length-1){ const xf=p[p.length-1]; const atPeak=Math.abs(xf)<0.5; const div=Math.abs(xf)>3;
+        document.getElementById('info2').innerHTML=`<div class="ttl" style="color:${atPeak||div?'var(--k)':'var(--good)'}">최종 x=${VZ.fmt(xf,2)}</div><p style="margin:0">${div?'<b style="color:var(--k)">곡선 밖으로 튕겼어요!</b> 오목한 포물선의 꼭짓점이 엉뚱한 곳이라 한 번에 멀리 날아갔어요.':atPeak?'<b style="color:var(--k)">봉우리로 갔어요!</b> 골(최소)이 아니라 최대로 — 오목 구간의 함정.':'골에 닿았어요(볼록 구간에서 시작).'}</p>`; }
+    },{interval:280});
+  }
+  document.getElementById('sx').oninput=e=>{ sx=+e.target.value/100; document.getElementById('sxv').textContent=(sx<0?'−':'')+Math.abs(sx).toFixed(1); reset(); };
+  document.getElementById('roll2').onclick=roll;
+  document.getElementById('reset2').onclick=reset;
+  reset();
+})();
+</script>
+</body>
+</html>

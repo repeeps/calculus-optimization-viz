@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 경사하강 · 미적분·최적화, 눈으로 보기</title>
+<link rel="stylesheet" href="shared/theme.css">
+<style>
+  .legend{font-size:12px; color:var(--faint); line-height:1.7; font-family:'JetBrains Mono',monospace;}
+  .twocol{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+  .colbox{background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav" id="topnav"></div>
+
+  <header>
+    <div class="tag">PART 4 · Chapter 10</div>
+    <h1>경사하강 — 기울기 반대로 한 걸음씩</h1>
+    <p class="intro">드디어 최적화의 심장이에요. 가장 빠른 내리막은 <b>−∇f</b>(기울기 반대)였죠(8·9장). 그 방향으로 <b>학습률 η만큼 한 걸음</b> 옮기길 반복하면 골짜기(최소)에 닿아요: <b>x ← x − η·f′(x)</b>. 딥러닝이 손실을 줄이는 방식이 정확히 이거예요. 학습률이 전부를 좌우하죠.</p>
+  </header>
+
+  <nav class="stepper" id="stepper">
+    <button data-s="0" class="active">00 · 한 걸음 규칙</button>
+    <button data-s="1">01 · 학습률이 전부</button>
+    <button data-s="2">02 · 2D 지형에서</button>
+    <button data-s="3">03 · 이게 학습이다</button>
+  </nav>
+
+  <!-- STEP 0 -->
+  <section class="panel show" data-panel="0">
+    <span class="kicker" style="color:var(--hot)">Step 00 — The Update Rule</span>
+    <h2>x ← x − η·f′(x)</h2>
+    <p class="lead">현재 위치의 기울기 f′(x)를 구해, 그 <b>반대 방향</b>으로 <b>η(학습률)배</b>만큼 이동해요. 기울기가 +면 왼쪽, −면 오른쪽으로 — 늘 <b>내려가는 쪽</b>이죠. ▶로 한 걸음씩 눌러보세요.</p>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="step1">▶ 한 걸음</button>
+      <button class="btn" id="reset0" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info0" class="callout q"></div>
+    <div class="chart-wrap" id="chart0" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 골짜기에 가까워질수록 기울기 f′이 작아져 <b>걸음도 저절로 작아져요</b>(걸음 = η·f′). 그래서 부드럽게 멈춰요. 기울기가 0(바닥)이면 더 안 움직이죠 — 도착!</p>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="panel" data-panel="1">
+    <span class="kicker" style="color:var(--q)">Step 01 — Learning Rate is Everything</span>
+    <h2>너무 작으면 굼뜨고, 너무 크면 튕긴다</h2>
+    <p class="lead">학습률 <b>η</b>를 바꿔 ▶로 굴려보세요. <b>작으면</b> 잔걸음으로 느리고, <b>적당하면</b> 골로 쏙, <b>너무 크면</b> 골짜기를 건너뛰며 <b style="color:var(--k)">발산</b>해요(점점 위로 튕김).</p>
+    <div class="ctrl"><label>학습률 η</label><input type="range" id="lr" min="2" max="220" value="40"><span class="val" id="lrv">0.40</span></div>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="roll1">▶ 굴리기</button>
+      <button class="btn" id="reset1" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 리셋</button>
+    </div>
+    <div id="info1" class="callout q"></div>
+    <div class="chart-wrap" id="chart1" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ η가 작을수록 안전하지만 느리고, 클수록 빠르지만 위험해요. 이 함수에선 η가 <b>2 이상</b>이면 발산해요(그릇이 가파를수록 한계가 작아짐). 슬라이더를 끝까지 올려 직접 튕겨보세요. "적당한 η 찾기"가 딥러닝 학습의 첫 고민이에요(11장).</p>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" data-panel="2">
+    <span class="kicker" style="color:var(--v)">Step 02 — On a 2D Landscape</span>
+    <h2>지형 위에서 골을 향해</h2>
+    <p class="lead">2D 지형(등고선)에서도 똑같아요. 매 걸음 <b>−∇f</b>(가장 가파른 내리막) 방향으로 이동하면, 경로가 골을 향해 굽이쳐 내려가요. 시작점과 학습률을 바꿔 경로를 비교해 보세요.</p>
+    <div class="ctrl"><label>학습률 η</label><input type="range" id="lr2" min="5" max="120" value="35"><span class="val" id="lr2v">0.35</span></div>
+    <div class="row" style="gap:8px;margin:6px 0">
+      <button class="btn" id="roll2">▶ 굴리기</button>
+      <button class="btn" id="reset2" style="border-color:var(--line);background:var(--panel-2);color:var(--muted)">↺ 시작점 바꿔 리셋</button>
+    </div>
+    <div id="info2" class="callout v"></div>
+    <div class="chart-wrap" id="chart2" style="margin-top:10px"></div>
+    <p class="note" style="margin-top:12px">→ 기울어진 그릇에선 경로가 <b>가파른 쪽으로 먼저 꺾이며</b> 굽이쳐 내려가요. η가 크면 한 걸음이 커져 더 크게 출렁이죠. 이 경로가 곧 신경망이 손실을 줄이는 자취예요.</p>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" data-panel="3">
+    <span class="kicker" style="color:var(--good)">Step 03 — This is Learning</span>
+    <h2>경사하강이 곧 "학습"</h2>
+    <div class="twocol">
+      <div class="callout q"><div class="ttl">업데이트 규칙</div><p style="margin:0">x ← x − η·∇f. 기울기 반대로 한 걸음씩. 기울기 0(골)에서 멈춤.</p></div>
+      <div class="callout v"><div class="ttl">η가 운명</div><p style="margin:0">작으면 느림, 크면 발산. 적당한 η가 빠르고 안정.</p></div>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <p style="margin:0">딥러닝에서 f는 <b>손실(틀린 정도)</b>, x는 <b>수백만 개의 가중치</b>예요. 차원만 어마어마할 뿐, 하는 일은 똑같아요: <b>−∇(손실) 방향으로 한 걸음씩</b>. 그래디언트는 역전파(4장 연쇄법칙)로 구하고요. 다음 <b>11장</b>에서 학습률·모멘텀·지역최소 같은 실전 이슈를 봐요.</p>
+    </div>
+    <p class="note" style="margin-top:16px">→ <a href="11-learning-rate-momentum.html" style="color:var(--q);font-weight:700">CH 11 · 학습률·모멘텀</a> · <a href="index.html">목차</a></p>
+  </section>
+
+  <p class="foot">// 수식 없는 직관 입문 · 모든 경로·기울기는 브라우저에서 실시간 계산 · <a href="index.html">목차</a></p>
+</div>
+
+<script src="shared/lib.js"></script>
+<script>
+VZ.mountTopnav('#topnav', 'CH 10 · 경사하강');
+VZ.setupStepper();
+const CA = VZ.CA;
+const f1 = x => 0.5*x*x + 0.4;        // 1D 그릇, 최소 x=0 (x←x(1−η), η>2면 발산)
+const F2 = (x,y) => 0.3*x*x + 0.18*y*y + 0.16*x*y;
+
+// ---------- STEP 0 : 한 걸음 ----------
+(function(){
+  const eta=0.35, x0=2.6; let x=x0, n=0;
+  function draw(){
+    const b=CA.board2({W:560,H:280,xmin:-3,xmax:3,ymin:0,ymax:4});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,f1,{color:'var(--q)'});
+    s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(f1(x)).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function info(){ const g=CA.deriv(f1,x), stepv=eta*g;
+    document.getElementById('info0').innerHTML=`<div class="ttl" style="color:var(--q)">${n}걸음 · x=${VZ.fmt(x,3)} · 기울기 f′=${VZ.fmt(g,2)}</div>
+      <p style="margin:0">다음 걸음 = η·f′ = ${eta}×${VZ.fmt(g,2)} = ${VZ.fmt(stepv,3)} → x를 그만큼 ${g>0?'왼쪽':'오른쪽'}으로. ${Math.abs(g)<0.05?'<b style="color:var(--good)">기울기≈0, 도착!</b>':''}</p>`; }
+  function stepOnce(){ const g=CA.deriv(f1,x); x=x-eta*g; n++; draw(); info(); }
+  function reset(){ x=x0; n=0; draw(); info(); }
+  document.getElementById('step1').onclick=stepOnce;
+  document.getElementById('reset0').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 1 : 학습률(1D) ----------
+(function(){
+  let lr=0.40, path=null, cancel=null; const x0=2.6;
+  function frame(k){
+    const b=CA.board2({W:560,H:280,xmin:-3,xmax:3,ymin:0,ymax:5});
+    let s=CA.axes(b,{step:1})+CA.fnPlot(b,f1,{color:'var(--q)'});
+    if(path){ for(let i=0;i<=k&&i<path.length;i++){ const x=Math.max(-3,Math.min(3,path[i][0]));
+      if(i>0){ const px=Math.max(-3,Math.min(3,path[i-1][0])); s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(f1(px)).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(f1(x)).toFixed(1)}" stroke="rgba(251,191,36,.5)" stroke-width="1.5"/>`; }
+      s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(f1(x)).toFixed(1)}" r="${i===Math.min(k,path.length-1)?6:3}" fill="${i===Math.min(k,path.length-1)?'var(--hot)':'rgba(251,191,36,.5)'}" ${i===Math.min(k,path.length-1)?'stroke="#000" stroke-width="1.5"':''}/>`; } }
+    else s+=`<circle cx="${b.X(x0).toFixed(1)}" cy="${b.Y(f1(x0)).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart1').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; path=null; frame(0);
+    document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">학습률 η=${VZ.fmt(lr,2)}</div><p style="margin:0">▶로 굴려보세요. ${lr>=2?'<b style="color:var(--k)">η가 2 이상 — 발산할 거예요!</b>':lr<0.1?'아주 작아 굼뜰 거예요.':'적당한 편.'}</p>`; }
+  function roll(){ if(cancel)cancel();
+    path=CA.gradDescent(p=>[CA.deriv(f1,p[0])],[x0],{lr,steps:36,clip:8});
+    cancel=CA.animatePath(path,(sub,i)=>{ frame(i); const x=path[Math.min(i,path.length-1)][0]; const diverge=Math.abs(x)>3;
+      document.getElementById('info1').innerHTML=`<div class="ttl" style="color:var(--q)">η=${VZ.fmt(lr,2)} · ${i+1}걸음 · x=${VZ.fmt(x,2)}</div>
+        <p style="margin:0">${diverge?'<b style="color:var(--k)">발산! 골을 건너뛰며 위로 튕겨요.</b> η를 줄이세요.':Math.abs(CA.deriv(f1,x))<0.05?'<b style="color:var(--good)">골 도착!</b>':'내려가는 중…'}</p>`;
+    },{interval:150});
+  }
+  document.getElementById('lr').oninput=e=>{ lr=+e.target.value/100; document.getElementById('lrv').textContent=lr.toFixed(2); reset(); };
+  document.getElementById('roll1').onclick=roll;
+  document.getElementById('reset1').onclick=reset;
+  reset();
+})();
+
+// ---------- STEP 2 : 2D 경사하강 ----------
+(function(){
+  const starts=[[-2.4,2.2],[2.5,-2.2],[2.6,2.4],[-2.6,-1.8]]; let si=0, lr=0.35, path=null, cancel=null;
+  function frame(k){
+    const b=CA.board2({W:420,H:320,xmin:-3,xmax:3,ymin:-3,ymax:3,padL:14,padR:14,padT:14,padB:14});
+    let s=CA.contourGrid(b,F2,{nx:44,ny:34,levels:10});
+    const st=starts[si];
+    if(path){ for(let i=0;i<=k&&i<path.length;i++){ const [x,y]=path[i];
+      if(i>0){ const [px,py]=path[i-1]; s+=`<line x1="${b.X(px).toFixed(1)}" y1="${b.Y(py).toFixed(1)}" x2="${b.X(x).toFixed(1)}" y2="${b.Y(y).toFixed(1)}" stroke="rgba(251,191,36,.6)" stroke-width="1.5"/>`; }
+      s+=`<circle cx="${b.X(x).toFixed(1)}" cy="${b.Y(y).toFixed(1)}" r="${i===Math.min(k,path.length-1)?6:2.5}" fill="${i===Math.min(k,path.length-1)?'var(--hot)':'rgba(251,191,36,.55)'}" ${i===Math.min(k,path.length-1)?'stroke="#000" stroke-width="1.5"':''}/>`; } }
+    else s+=`<circle cx="${b.X(st[0]).toFixed(1)}" cy="${b.Y(st[1]).toFixed(1)}" r="6" fill="var(--hot)" stroke="#000" stroke-width="1.5"/>`;
+    document.getElementById('chart2').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block">${s}</svg>`;
+  }
+  function reset(){ if(cancel)cancel(); cancel=null; path=null; frame(0);
+    document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">시작 (${VZ.fmt(starts[si][0],1)}, ${VZ.fmt(starts[si][1],1)}) · η=${VZ.fmt(lr,2)}</div><p style="margin:0">▶로 −∇f를 따라 골로 굴러가는 경로를 보세요.</p>`; }
+  function roll(){ if(cancel)cancel();
+    path=CA.gradDescent(p=>CA.gradient(F2,p[0],p[1]),starts[si],{lr,steps:50,clip:4});
+    cancel=CA.animatePath(path,(sub,i)=>{ frame(i); const [x,y]=path[Math.min(i,path.length-1)];
+      document.getElementById('info2').innerHTML=`<div class="ttl" style="color:var(--v)">${i+1}걸음 · (${VZ.fmt(x,2)}, ${VZ.fmt(y,2)}) · 높이 ${VZ.fmt(F2(x,y),2)}</div><p style="margin:0">${Math.hypot(...CA.gradient(F2,x,y))<0.05?'<b style="color:var(--good)">골 도착!</b> 어느 시작점에서 시작해도 같은 골(그릇이라 골이 하나)로 모여요.':'−∇f 방향으로 내려가는 중…'}</p>`;
+    },{interval:120});
+  }
+  document.getElementById('lr2').oninput=e=>{ lr=+e.target.value/100; document.getElementById('lr2v').textContent=lr.toFixed(2); reset(); };
+  document.getElementById('roll2').onclick=roll;
+  document.getElementById('reset2').onclick=()=>{ si=(si+1)%starts.length; reset(); };
+  reset();
+})();
+</script>
+</body>
+</html>
