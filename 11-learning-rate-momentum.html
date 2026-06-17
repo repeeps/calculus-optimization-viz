@@ -111,9 +111,10 @@ const wig  = x => 0.15*x*x*x*x - 0.8*x*x - 0.12*x + 1.6;  // 이중 골(왼쪽 �
     s+=`<path d="${d}" fill="none" stroke="var(--hot)" stroke-width="2.5"/>`;
     pts.forEach(p=>{ s+=`<circle cx="${b.X(p[0]).toFixed(1)}" cy="${b.Y(Math.min(p[1],b.ymax)).toFixed(1)}" r="2.5" fill="var(--hot)"/>`; });
     document.getElementById('chart0').innerHTML=`<svg width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}" style="max-width:100%;display:block"><text x="14" y="12" fill="var(--faint)" font-size="11" font-family="JetBrains Mono">세로=손실, 가로=걸음 수</text>${s}</svg>`;
+    const converged = !diverged && steps < 40;
     document.getElementById('info0').innerHTML=
-      `<div class="ttl" style="color:var(--q)">η=${VZ.fmt(lr,2)} · ${diverged?'<b style="color:var(--k)">발산</b>':steps+'걸음 만에 골 도착'}</div>
-       <p style="margin:0">${lr<0.2?'너무 작아 굼떠요(많은 걸음 필요).':lr>2?'<b style="color:var(--k)">η≥2 — 손실이 치솟으며 발산!</b>':'적당해요 — 손실이 쭉 떨어져요.'}</p>`;
+      `<div class="ttl" style="color:var(--q)">η=${VZ.fmt(lr,2)} · ${diverged?'<b style="color:var(--k)">발산</b>':(converged?steps+'걸음 만에 골 도착':'<b style="color:var(--hot)">한곳에 못 멈추고 진동</b>')}</div>
+       <p style="margin:0">${lr<0.2?'너무 작아 굼떠요(많은 걸음 필요).':lr>2.001?'<b style="color:var(--k)">η가 2 초과 — 손실이 치솟으며 발산!</b>':lr>=1.99?'<b style="color:var(--hot)">η≈2 — 발산 경계, 한곳에 못 멈추고 진동.</b>':'적당해요 — 손실이 쭉 떨어져요.'}</p>`;
   }
   document.getElementById('lr0').oninput=e=>{ lr=+e.target.value/100; document.getElementById('lr0v').textContent=lr.toFixed(2); render(); };
   render();
